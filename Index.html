@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda Virtual</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="Interaction.js" defer></script>
+</head>
+
+<body>
+    
+    <div class="container">
+        <div class="header">
+            <h1>Agenda Virtual</h1>
+        </div>
+
+        <div class="content">
+            <h2>Início</h2>
+            <p>Esta é uma agenda virtual que terá todos os trabalhos e lições para fazer.</p>
+        </div>
+
+        <div class="task-container">
+            <h2>Adicionar Tarefa</h2>
+            <input type="text" id="taskInput" placeholder="Digite a tarefa...">
+            <button id="addTaskButton" class="add-btn">Adicionar</button>
+            <ul id="taskList"></ul>
+        </div>
+
+        <div class="calendar">
+            <h2>Calendário</h2>
+            <input type="date" id="task-date">
+        </div>
+
+
+        <div class="card" class="Lição" id="Lição1">
+            <img src="https://cdn-icons-png.flaticon.com/512/207/207473.png" alt="Lição de casa" class="card-image">
+            <div class="card-content">
+                <h3 class="card-title">Lição de casa</h3>
+                <h4>Geografia</h4>
+                <p class="card-description" id="card-description1">Pág 285 ex1</p>
+                <p class="para">Para 07/03/25</p>
+            </div>
+        </div>
+        
+        <div class="card" class="Lição" id="Lição2">
+            <img src="https://cdn-icons-png.flaticon.com/512/207/207473.png" alt="Lição de casa" class="card-image">
+            <div class="card-content">
+                <h3 class="card-title">Lição de casa</h3>
+                <h4>Ciências</h4>
+                <p class="card-description" id="card-description1">Pág 360 ex3</p>
+                <p class="para">Para 12/03/25</p>
+            </div>
+        </div>
+        
+        <div class="card" class="Lição" id="Lição3">
+            <img src="https://cdn-icons-png.flaticon.com/512/207/207473.png" alt="Lição de casa" class="card-image">
+            <div class="card-content">
+                <h3 class="card-title">Lição de casa</h3>
+                <h4>Português</h4>
+                <p class="card-description" id="card-description1">Pág 141 a 143 ex1 e 2</p>
+                <p class="para">Para 11/03/25</p>
+            </div>
+        </div>
+        
+        <div class="card" class="Lição" id="Lição4">
+            <img src="https://cdn-icons-png.flaticon.com/512/207/207473.png" alt="Lição de casa" class="card-image">
+            <div class="card-content">
+                <h3 class="card-title">Lição de casa</h3>
+                <h4>E.I</h4>
+                <p class="card-description" id="card-description1">Pág 29 e 30</p>
+                <p class="para">Para 07/03/25</p>
+            </div>
+        </div>
+        
+        <div class="card" class="Lição" id="Lição5">
+            <img src="https://cdn-icons-png.flaticon.com/512/207/207473.png" alt="Lição de casa" class="card-image">
+            <div class="card-content">
+                <h3 class="card-title">Lição de casa</h3>
+                <h4>Inglês</h4>
+                <p class="card-description" id="card-description1">Pág 9</p>
+                <p class="para">Para 10/03/25</p>
+            </div>
+        </div>
+        
+        <div class="card" class="Lição" id="Lição6">
+            <img src="https://cdn-icons-png.flaticon.com/512/207/207473.png" alt="Lição de casa" class="card-image">
+            <div class="card-content">
+                <h3 class="card-title">Lição de casa</h3>
+                <h4>Geografia</h4>
+                <p class="card-description" id="card-description1">Pág</p>
+                <p class="para">Para 07/03/25</p>
+            </div>
+        </div>
+        
+        <div class="card" class="Lição" id="Lição7">
+            <img src="https://cdn-icons-png.flaticon.com/512/207/207473.png" alt="Lição de casa" class="card-image">
+            <div class="card-content">
+                <h3 class="card-title">Lição de casa</h3>
+                <h4>Geografia</h4>
+                <p class="card-description" id="card-description1">Pág</p>
+                <p class="para">Para 07/03/25</p>
+            </div>
+        </div>
+        
+
+
+
+
+
+        <div class="card" class="Lição" id="Trabalho1">
+            <img src="https://png.pngtree.com/png-clipart/20230504/original/pngtree-team-work-line-icon-png-image_9137751.png" alt="Lição de casa" class="card-image">
+            <div class="card-content">
+                <h3 class="card-title">Trabalho</h3>
+                <h4>História</h4>
+                <p class="card-description" id="card-description1">Crie um relatório sobre alguma obra da Capela Sistina</p>
+                <p>Para 12/03/25</p>
+                <button onclick="window.open('https://www.vatican.va/various/cappelle/index_sistina_en.htm', '_blank')" class="cardbutton">
+                    Abrir Capela Sistina
+                </button>
+                
+            </div>
+        </div>
+        
+        <div class="card" class="Lição" id="Trabalho2">
+            <img src="https://png.pngtree.com/png-clipart/20230504/original/pngtree-team-work-line-icon-png-image_9137751.png" alt="Lição de casa" class="card-image">
+            <div class="card-content">
+                <h3 class="card-title">Trabalho</h3>
+                <h4>História</h4>
+                <p class="card-description" id="card-description1">Crie algo que valorize a capacidade humana (Pintura, Poema, Escultura, Maquete)</p>
+                <p>Para 03/04/25</p>
+            </div>
+        </div>
+        
+        <div class="card" class="Lição" id="Trabalho3">
+            <img src="https://png.pngtree.com/png-clipart/20230504/original/pngtree-team-work-line-icon-png-image_9137751.png" alt="Lição de casa" class="card-image">
+            <div class="card-content">
+                <h3 class="card-title">Trabalho</h3>
+                <h4>História</h4>
+                <p class="card-description" id="card-description1"></p>
+            </div>
+        </div>
+        
+        <div class="card" class="Lição" id="Trabalho4">
+            <img src="https://png.pngtree.com/png-clipart/20230504/original/pngtree-team-work-line-icon-png-image_9137751.png" alt="Lição de casa" class="card-image">
+            <div class="card-content">
+                <h3 class="card-title">Trabalho</h3>
+                <h4>História</h4>
+                <p class="card-description" id="card-description1"></p>
+            </div>
+        </div>
+        
+        <div class="card" class="Lição" id="Trabalho5">
+            <img src="https://png.pngtree.com/png-clipart/20230504/original/pngtree-team-work-line-icon-png-image_9137751.png" alt="Lição de casa" class="card-image">
+            <div class="card-content">
+                <h3 class="card-title">Trabalho</h3>
+                <h4>História</h4>
+                <p class="card-description" id="card-description1"></p>
+            </div>
+        </div>
+        
+
+    </div>
+</body>
+
+</html>
