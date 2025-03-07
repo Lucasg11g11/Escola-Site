@@ -198,7 +198,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     card.style.display = "block"; // Exibe cards com descrição
                 }
             });
-            alert("Nenhuma tarefa encontrada para essa data. Exibindo todos os cards com lições.");
+            alert("Tente novamente");
         }
 
         // Exibe o botão "Mostrar todas as lições" somente se houver lições encontradas
