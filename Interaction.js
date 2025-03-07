@@ -73,3 +73,75 @@ document.addEventListener("DOMContentLoaded", function () {
 
     loadTasks();
 });
+
+
+//Abrir lição calendário
+
+document.addEventListener("DOMContentLoaded", function () {
+    const dateInput = document.getElementById("task-date");
+    const cards = document.querySelectorAll(".card");
+    const showAllButton = document.createElement("button");
+
+    // Configuração do botão "Mostrar todas as lições"
+    showAllButton.textContent = "Mostrar todas as lições";
+    showAllButton.style.display = "none"; // Inicialmente oculto
+    showAllButton.classList.add("show-all-btn"); // Adiciona uma classe para estilização
+
+    // Insere o botão abaixo do calendário
+    dateInput.parentElement.appendChild(showAllButton);
+
+    dateInput.addEventListener("change", function () {
+        const selectedDate = this.value.split("-").reverse().join("/"); // Converte 'YYYY-MM-DD' para 'DD/MM/YYYY'
+        let hasMatch = false;
+
+        cards.forEach(card => {
+            const dueDateElement = card.querySelector(".para");
+            const descriptionElement = card.querySelector(".card-description");
+
+            if (dueDateElement && descriptionElement) {
+                let dueDate = dueDateElement.textContent.trim().replace("Para ", ""); // Remove "Para "
+                let description = descriptionElement.textContent.trim(); // Obtém a descrição
+
+                if (dueDate === selectedDate && description !== "") {
+                    card.style.display = "block"; // Exibe o card se a data for correspondente e a descrição estiver preenchida
+                    hasMatch = true;
+                } else {
+                    card.style.display = "none"; // Esconde os cards inválidos
+                }
+            }
+        });
+
+        // Se não houver lições para a data, exibe todos os cards com descrição
+        if (!hasMatch) {
+            cards.forEach(card => {
+                const descriptionElement = card.querySelector(".card-description");
+                if (descriptionElement && descriptionElement.textContent.trim() !== "") {
+                    card.style.display = "block"; // Exibe cards com descrição
+                }
+            });
+            alert("Nenhuma tarefa encontrada para essa data. Exibindo todos os cards com lições.");
+        }
+
+        // Exibe o botão "Mostrar todas as lições" somente se houver lições encontradas
+        if (hasMatch) {
+            showAllButton.style.display = "block";
+        } else {
+            showAllButton.style.display = "none";
+        }
+    });
+
+    // Evento do botão para exibir novamente apenas os cards com lições válidas e resetar a data
+    showAllButton.addEventListener("click", function () {
+        cards.forEach(card => {
+            const descriptionElement = card.querySelector(".card-description");
+            if (descriptionElement && descriptionElement.textContent.trim() !== "") {
+                card.style.display = "block"; // Apenas os cards com lições são exibidos
+            }
+        });
+
+        // Reseta o campo de data
+        dateInput.value = ""; // Limpa o campo de data
+
+        showAllButton.style.display = "none"; // Oculta o botão novamente
+    });
+});
