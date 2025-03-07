@@ -22,11 +22,23 @@
         </div>
 
         <div class="task-container">
-            <h2>Adicionar Tarefa Pendente (Aparace apenas pra você)</h2>
-            <input type="text" id="taskInput" placeholder="Digite a tarefa...">
+            <h2>Adicionar Tarefa Pendente (Aparece apenas pra você)</h2>
+        
+            <!-- Seleção da matéria -->
+            <select id="subjectSelect">
+                <option value="" disabled selected>Selecione a matéria...</option>
+            </select>
+        
+            <!-- Seleção da descrição -->
+            <select id="descriptionSelect" disabled>
+                <option value="" disabled selected>Selecione a Página/Tc online/Trabalho...</option>
+            </select>
+        
             <button id="addTaskButton" class="add-btn">Adicionar</button>
             <ul id="taskList"></ul>
         </div>
+        
+        
 
         <div class="calendar">
             <h2>Tem uma lição para... Selecione o dia abaixo</h2>
@@ -115,7 +127,7 @@
             <div class="card-content">
                 <h3 class="card-title">Trabalho</h3>
                 <h4>História</h4>
-                <p class="card-description" id="card-description1">Crie um relatório sobre alguma obra da Capela Sistina</p>
+                <p class="card-description" id="card-description1">Instrução: Crie um relatório sobre alguma obra da Capela Sistina</p>
                 <p class="para">Para 12/03/2025</p>
                 <button onclick="window.open('https://www.vatican.va/various/cappelle/index_sistina_en.htm', '_blank')" class="cardbutton">
                     Abrir Capela Sistina
@@ -129,7 +141,7 @@
             <div class="card-content">
                 <h3 class="card-title">Trabalho</h3>
                 <h4>História</h4>
-                <p class="card-description" id="card-description1">Crie algo que valorize a capacidade humana (Pintura, Poema, Escultura, Maquete)</p>
+                <p class="card-description" id="card-description1">Instrução: Crie algo que valorize a capacidade humana (Pintura, Poema, Escultura, Maquete)</p>
                 <p class="para">Para 03/04/2025</p>
             </div>
         </div>
@@ -172,7 +184,7 @@
             <div class="card-content">
                 <h3 class="card-title">Tc Online</h3>
                 <h4>Geografia</h4>
-                <p class="card-description" id="card-description1">Módulos 1 e 2</p>
+                <p class="card-description" id="card-description1">Tc: Módulos 1 e 2</p>
                 <p class="para">Para 14/03/2025</p>
                 <button onclick="window.open('https://atividades.plurall.net/material/11728500/?search_disciplines%5B%5D=geografia', '_blank')" class="cardbutton">
                     Abrir Tc Online
@@ -186,7 +198,7 @@
             <div class="card-content">
                 <h3 class="card-title">Tc Online</h3>
                 <h4>Português</h4>
-                <p class="card-description" id="card-description1">Módulos 1, 2 e 5</p>
+                <p class="card-description" id="card-description1">Tc: Módulos 1, 2 e 5</p>
                 <p class="para">Para 11/03/2025</p>
                 <button onclick="window.open('https://atividades.plurall.net/material/11728500/?search_disciplines%5B%5D=lingua_portuguesa', '_blank')" class="cardbutton">
                     Abrir Tc Online
