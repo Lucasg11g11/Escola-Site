@@ -5,11 +5,8 @@
     const taskList = document.getElementById("taskList");
 
     document.addEventListener("DOMContentLoaded", function () {
-        const subjectSelect = document.getElementById("subjectSelect");
-        const descriptionSelect = document.getElementById("descriptionSelect");
-        const addTaskButton = document.getElementById("addTaskButton");
-        const taskList = document.getElementById("taskList");
     
+        // Função para atualizar os selects (matéria e descrição)
         function atualizarSelects() {
             subjectSelect.innerHTML = '<option value="" disabled selected>Selecione a matéria...</option>';
             descriptionSelect.innerHTML = '<option value="" disabled selected>Selecione a descrição...</option>';
@@ -20,8 +17,8 @@
             const descricoesMap = {};
     
             cards.forEach(card => {
-                const materia = card.querySelector("h4").textContent.trim();
-                const descricao = card.querySelector(".card-description").textContent.trim();
+                const materia = card.querySelector("h4")?.textContent.trim();
+                const descricao = card.querySelector(".card-description")?.textContent.trim();
     
                 if (materia) materiasSet.add(materia);
                 if (materia && descricao) {
@@ -53,9 +50,15 @@
                 } else {
                     descriptionSelect.disabled = true;
                 }
+    
+                // Limpar o destaque de todos os cards
+                document.querySelectorAll(".card").forEach(card => {
+                    card.classList.remove("highlighted");
+                });
             });
         }
     
+        // Função para salvar as tarefas no localStorage
         function salvarTarefas() {
             const tarefas = [];
             document.querySelectorAll("#taskList li").forEach(li => {
@@ -63,8 +66,15 @@
                 tarefas.push(textoTarefa);
             });
             localStorage.setItem("tarefas", JSON.stringify(tarefas));
+    
+            // Salvar o estado atual da matéria e descrição selecionada
+            const selectedSubject = subjectSelect.value;
+            const selectedDescription = descriptionSelect.value;
+            localStorage.setItem("selectedSubject", selectedSubject);
+            localStorage.setItem("selectedDescription", selectedDescription);
         }
     
+        // Função para carregar as tarefas salvas do localStorage
         function carregarTarefas() {
             const tarefasSalvas = JSON.parse(localStorage.getItem("tarefas")) || [];
             tarefasSalvas.forEach(tarefa => {
@@ -72,6 +82,38 @@
             });
         }
     
+        // Função para carregar a seleção salva no localStorage
+        function carregarSelecao() {
+            const selectedSubject = localStorage.getItem("selectedSubject");
+            const selectedDescription = localStorage.getItem("selectedDescription");
+    
+            if (selectedSubject && selectedDescription) {
+                subjectSelect.value = selectedSubject;
+                descriptionSelect.value = selectedDescription;
+                destacarCard(selectedSubject, selectedDescription);
+            }
+        }
+    
+        // Função para destacar o card correto
+        function destacarCard(selectedSubject, selectedDescription) {
+            // Limpar o destaque de todos os cards
+            document.querySelectorAll(".card").forEach(card => {
+                card.classList.remove("highlighted");
+            });
+    
+            // Procurar o card correspondente à matéria e descrição
+            const cards = document.querySelectorAll(".card");
+            cards.forEach(card => {
+                const cardMateria = card.querySelector("h4")?.textContent.trim();
+                const cardDescricao = card.querySelector(".card-description")?.textContent.trim();
+    
+                if (cardMateria === selectedSubject && cardDescricao === selectedDescription) {
+                    card.classList.add("highlighted"); // Destacar o card
+                }
+            });
+        }
+    
+        // Função para adicionar a tarefa na lista
         function adicionarTarefaNaLista(tarefaTexto) {
             // Verificar se a tarefa já existe na lista
             const tarefasExistentes = Array.from(taskList.children).map(li => li.firstChild.textContent.trim());
@@ -111,14 +153,28 @@
             }
         });
     
+        // Destacar o card correspondente ao selecionar matéria e descrição
+        descriptionSelect.addEventListener("change", function () {
+            const selectedSubject = subjectSelect.value;
+            const selectedDescription = descriptionSelect.value;
+    
+            if (selectedSubject && selectedDescription) {
+                salvarTarefas(); // Salvar o estado atual
+                destacarCard(selectedSubject, selectedDescription);
+            }
+        });
+    
+        // Atualiza os selects inicialmente
         atualizarSelects();
         carregarTarefas();
+        carregarSelecao(); // Carregar a seleção e destaque do localStorage
     
         // Atualizar selects automaticamente se os cards mudarem
         const observer = new MutationObserver(() => {
             atualizarSelects();
         });
     
+        // Observar mudanças nos elementos .card
         document.querySelectorAll(".card").forEach(card => {
             observer.observe(card, { childList: true, subtree: true, characterData: true });
         });
