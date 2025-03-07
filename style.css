@@ -254,6 +254,35 @@ input[type="date"] {
     background-color: #004a8c;
 }
 
+/* Estilo básico para o botão "Mostrar todas as lições" */
+.show-all-btn {
+    background-color: #4CAF50; /* Cor de fundo verde */
+    color: white; /* Texto branco */
+    padding: 10px 20px; /* Espaçamento interno */
+    border: none; /* Remove borda */
+    border-radius: 5px; /* Cantos arredondados */
+    font-size: 16px; /* Tamanho da fonte */
+    cursor: pointer; /* Aponta para o cursor em forma de mão */
+    transition: background-color 0.3s ease; /* Transição suave ao passar o mouse */
+    margin-top: 10px; /* Espaço acima do botão */
+}
+
+/* Efeito ao passar o mouse (hover) */
+.show-all-btn:hover {
+    background-color: #45a049; /* Cor de fundo mais escura ao passar o mouse */
+}
+
+/* Efeito ao pressionar o botão (active) */
+.show-all-btn:active {
+    background-color: #388e3c; /* Cor ainda mais escura ao pressionar */
+}
+
+/* Estilo para o botão quando estiver invisível (inicialmente) */
+.show-all-btn[style*="display: none"] {
+    display: none; /* Garante que o botão esteja oculto quando não necessário */
+}
+
+
 #Lição1 {
     display: visible;
 }
@@ -299,5 +328,21 @@ input[type="date"] {
 }
 
 #Trabalho5 {
+    display: none;
+}
+
+#Tc1 {
+    display: visible;
+}
+
+#Tc2 {
+    display: visible;
+}
+
+#Tc3 {
+    display: none;
+}
+
+#Tc4 {
     display: none;
 }
