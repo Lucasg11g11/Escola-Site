@@ -282,6 +282,88 @@ input[type="date"] {
     display: none; /* Garante que o botão esteja oculto quando não necessário */
 }
 
+/* Caixa de seleção */
+select {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 2px solid #4CAF50; /* Borda verde */
+    border-radius: 5px;
+    font-size: 16px;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+select:focus {
+    border-color: #388E3C; /* Verde mais escuro ao focar */
+    outline: none;
+    background-color: #fff;
+}
+
+/* Botão de adicionar */
+.add-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #4CAF50; /* Verde bonito */
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.add-btn:hover {
+    background-color: #388E3C; /* Cor mais escura ao passar o mouse */
+}
+
+/* Lista de tarefas */
+#taskList {
+    list-style: none;
+    padding: 0;
+    margin-top: 15px;
+}
+
+#taskList li {
+    background: #fff;
+    padding: 10px;
+    margin: 5px 0;
+    border-left: 5px solid #4CAF50; /* Marca verde na lateral */
+    border-radius: 5px;
+    font-size: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Ícone de remover tarefa */
+.remove-btn {
+    background: none;
+    border: none;
+    color: red;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.remove-btn:hover {
+    color: darkred;
+}
+
+/* CSS para destacar o card */
+.card.highlighted {
+    border: 2px solid rgb(255, 0, 0); /* Cor verde para destacar */
+    background-color: #f0f8f0; /* Fundo levemente verde */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Sombra para chamar atenção */
+}
+
+.card {
+    border: 2px solid rgb(0, 255, 0); /* Cor verde para destacar */
+    background-color: #f0f8f0; /* Fundo levemente verde */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Sombra para chamar atenção */
+}
+
 
 #Lição1 {
     display: visible;
