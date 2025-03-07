@@ -5,141 +5,181 @@
     const taskList = document.getElementById("taskList");
 
     document.addEventListener("DOMContentLoaded", function () {
-    const subjectSelect = document.getElementById("subjectSelect");
-    const descriptionSelect = document.getElementById("descriptionSelect");
-    const addTaskButton = document.getElementById("addTaskButton");
-    const taskList = document.getElementById("taskList");
-
-    function atualizarSelects() {
-        subjectSelect.innerHTML = '<option value="" disabled selected>Selecione a matéria...</option>';
-        descriptionSelect.innerHTML = '<option value="" disabled selected>Selecione a descrição...</option>';
-        descriptionSelect.disabled = true;
-
-        const cards = document.querySelectorAll(".card");
-        const materiasSet = new Set();
-        const descricoesMap = {};
-
-        cards.forEach(card => {
-            const materia = card.querySelector("h4").textContent.trim();
-            const descricao = card.querySelector(".card-description").textContent.trim();
-
-            if (materia) materiasSet.add(materia);
-            if (materia && descricao) {
-                if (!descricoesMap[materia]) descricoesMap[materia] = [];
-                descricoesMap[materia].push(descricao);
-            }
-        });
-
-        materiasSet.forEach(materia => {
-            const option = document.createElement("option");
-            option.value = materia;
-            option.textContent = materia;
-            subjectSelect.appendChild(option);
-        });
-
-        subjectSelect.addEventListener("change", function () {
-            const selectedSubject = subjectSelect.value;
+    
+        // Função para atualizar os selects (matéria e descrição)
+        function atualizarSelects() {
+            subjectSelect.innerHTML = '<option value="" disabled selected>Selecione a matéria...</option>';
             descriptionSelect.innerHTML = '<option value="" disabled selected>Selecione a descrição...</option>';
-
-            if (descricoesMap[selectedSubject]) {
-                descricoesMap[selectedSubject].forEach(desc => {
-                    const option = document.createElement("option");
-                    option.value = desc;
-                    option.textContent = desc;
-                    descriptionSelect.appendChild(option);
-                });
-
-                descriptionSelect.disabled = false;
-            } else {
-                descriptionSelect.disabled = true;
-            }
-        });
-    }
-
-    function salvarTarefas() {
-        const tarefas = [];
-        document.querySelectorAll("#taskList li").forEach(li => {
-            const textoTarefa = li.firstChild.textContent.trim();
-            tarefas.push(textoTarefa);
-        });
-        localStorage.setItem("tarefas", JSON.stringify(tarefas));
-    }
-
-    function carregarTarefas() {
-        const tarefasSalvas = JSON.parse(localStorage.getItem("tarefas")) || [];
-        tarefasSalvas.forEach(tarefa => {
-            adicionarTarefaNaLista(tarefa);
-        });
-    }
-
-    function destacarCard(materia, descricao, destacar) {
-        document.querySelectorAll(".card").forEach(card => {
-            const cardMateria = card.querySelector("h4").textContent.trim();
-            const cardDescricao = card.querySelector(".card-description").textContent.trim();
-
-            if (cardMateria === materia && cardDescricao === descricao) {
-                if (destacar) {
-                    card.classList.add("highlighted");
-                } else {
-                    card.classList.remove("highlighted");
+            descriptionSelect.disabled = true;
+    
+            const cards = document.querySelectorAll(".card");
+            const materiasSet = new Set();
+            const descricoesMap = {};
+    
+            cards.forEach(card => {
+                const materia = card.querySelector("h4")?.textContent.trim();
+                const descricao = card.querySelector(".card-description")?.textContent.trim();
+    
+                if (materia) materiasSet.add(materia);
+                if (materia && descricao) {
+                    if (!descricoesMap[materia]) descricoesMap[materia] = [];
+                    descricoesMap[materia].push(descricao);
                 }
+            });
+    
+            materiasSet.forEach(materia => {
+                const option = document.createElement("option");
+                option.value = materia;
+                option.textContent = materia;
+                subjectSelect.appendChild(option);
+            });
+    
+            subjectSelect.addEventListener("change", function () {
+                const selectedSubject = subjectSelect.value;
+                descriptionSelect.innerHTML = '<option value="" disabled selected>Selecione a descrição...</option>';
+    
+                if (descricoesMap[selectedSubject]) {
+                    descricoesMap[selectedSubject].forEach(desc => {
+                        const option = document.createElement("option");
+                        option.value = desc;
+                        option.textContent = desc;
+                        descriptionSelect.appendChild(option);
+                    });
+    
+                    descriptionSelect.disabled = false;
+                } else {
+                    descriptionSelect.disabled = true;
+                }
+    
+                // Limpar o destaque de todos os cards
+                document.querySelectorAll(".card").forEach(card => {
+                    card.classList.remove("highlighted");
+                });
+            });
+        }
+    
+        // Função para salvar as tarefas no localStorage
+        function salvarTarefas() {
+            const tarefas = [];
+            document.querySelectorAll("#taskList li").forEach(li => {
+                const textoTarefa = li.firstChild.textContent.trim(); // Remove o botão "X"
+                tarefas.push(textoTarefa);
+            });
+            localStorage.setItem("tarefas", JSON.stringify(tarefas));
+    
+            // Salvar o estado atual da matéria e descrição selecionada
+            const selectedSubject = subjectSelect.value;
+            const selectedDescription = descriptionSelect.value;
+            localStorage.setItem("selectedSubject", selectedSubject);
+            localStorage.setItem("selectedDescription", selectedDescription);
+        }
+    
+        // Função para carregar as tarefas salvas do localStorage
+        function carregarTarefas() {
+            const tarefasSalvas = JSON.parse(localStorage.getItem("tarefas")) || [];
+            tarefasSalvas.forEach(tarefa => {
+                adicionarTarefaNaLista(tarefa);
+            });
+        }
+    
+        // Função para carregar a seleção salva no localStorage
+        function carregarSelecao() {
+            const selectedSubject = localStorage.getItem("selectedSubject");
+            const selectedDescription = localStorage.getItem("selectedDescription");
+    
+            if (selectedSubject && selectedDescription) {
+                subjectSelect.value = selectedSubject;
+                descriptionSelect.value = selectedDescription;
+                destacarCard(selectedSubject, selectedDescription);
+            }
+        }
+    
+        // Função para destacar o card correto
+        function destacarCard(selectedSubject, selectedDescription) {
+            // Limpar o destaque de todos os cards
+            document.querySelectorAll(".card").forEach(card => {
+                card.classList.remove("highlighted");
+            });
+    
+            // Procurar o card correspondente à matéria e descrição
+            const cards = document.querySelectorAll(".card");
+            cards.forEach(card => {
+                const cardMateria = card.querySelector("h4")?.textContent.trim();
+                const cardDescricao = card.querySelector(".card-description")?.textContent.trim();
+    
+                if (cardMateria === selectedSubject && cardDescricao === selectedDescription) {
+                    card.classList.add("highlighted"); // Destacar o card
+                }
+            });
+        }
+    
+        // Função para adicionar a tarefa na lista
+        function adicionarTarefaNaLista(tarefaTexto) {
+            // Verificar se a tarefa já existe na lista
+            const tarefasExistentes = Array.from(taskList.children).map(li => li.firstChild.textContent.trim());
+    
+            if (tarefasExistentes.includes(tarefaTexto)) {
+                alert("Esta tarefa já foi adicionada.");
+                return;
+            }
+    
+            const li = document.createElement("li");
+            li.textContent = tarefaTexto;
+    
+            // Criando botão de remover (X)
+            const removeButton = document.createElement("button");
+            removeButton.textContent = "X";
+            removeButton.classList.add("remove-btn");
+            removeButton.addEventListener("click", function () {
+                li.remove();
+                salvarTarefas();
+            });
+    
+            li.appendChild(removeButton);
+            taskList.appendChild(li);
+        }
+    
+        // Adicionar tarefa ao clicar no botão
+        addTaskButton.addEventListener("click", function () {
+            const selectedSubject = subjectSelect.value;
+            const selectedDescription = descriptionSelect.value;
+    
+            if (selectedSubject && selectedDescription) {
+                const tarefaTexto = `${selectedSubject}: ${selectedDescription}`;
+                adicionarTarefaNaLista(tarefaTexto);
+                salvarTarefas();
+            } else {
+                alert("Por favor, selecione a matéria e a descrição.");
             }
         });
-    }
-
-    function adicionarTarefaNaLista(tarefaTexto) {
-        const tarefasExistentes = Array.from(taskList.children).map(li => li.firstChild.textContent.trim());
-
-        if (tarefasExistentes.includes(tarefaTexto)) {
-            alert("Esta tarefa já foi adicionada.");
-            return;
-        }
-
-        const li = document.createElement("li");
-        li.textContent = tarefaTexto;
-
-        const removeButton = document.createElement("button");
-        removeButton.textContent = "X";
-        removeButton.classList.add("remove-btn");
-        removeButton.addEventListener("click", function () {
-            li.remove();
-            salvarTarefas();
-
-            const [materia, descricao] = tarefaTexto.split(": ").map(str => str.trim());
-            destacarCard(materia, descricao, false); // Remover destaque ao excluir
+    
+        // Destacar o card correspondente ao selecionar matéria e descrição
+        descriptionSelect.addEventListener("change", function () {
+            const selectedSubject = subjectSelect.value;
+            const selectedDescription = descriptionSelect.value;
+    
+            if (selectedSubject && selectedDescription) {
+                salvarTarefas(); // Salvar o estado atual
+                destacarCard(selectedSubject, selectedDescription);
+            }
         });
-
-        li.appendChild(removeButton);
-        taskList.appendChild(li);
-
-        const [materia, descricao] = tarefaTexto.split(": ").map(str => str.trim());
-        destacarCard(materia, descricao, true); // Destacar ao adicionar
-    }
-
-    addTaskButton.addEventListener("click", function () {
-        const selectedSubject = subjectSelect.value;
-        const selectedDescription = descriptionSelect.value;
-
-        if (selectedSubject && selectedDescription) {
-            const tarefaTexto = `${selectedSubject}: ${selectedDescription}`;
-            adicionarTarefaNaLista(tarefaTexto);
-            salvarTarefas();
-        } else {
-            alert("Por favor, selecione a matéria e a descrição.");
-        }
-    });
-
-    atualizarSelects();
-    carregarTarefas();
-
-    const observer = new MutationObserver(() => {
+    
+        // Atualiza os selects inicialmente
         atualizarSelects();
+        carregarTarefas();
+        carregarSelecao(); // Carregar a seleção e destaque do localStorage
+    
+        // Atualizar selects automaticamente se os cards mudarem
+        const observer = new MutationObserver(() => {
+            atualizarSelects();
+        });
+    
+        // Observar mudanças nos elementos .card
+        document.querySelectorAll(".card").forEach(card => {
+            observer.observe(card, { childList: true, subtree: true, characterData: true });
+        });
     });
-
-    document.querySelectorAll(".card").forEach(card => {
-        observer.observe(card, { childList: true, subtree: true, characterData: true });
-    });
-});
+    
     
 
 //Abrir lição calendário
