@@ -1,79 +1,130 @@
-document.addEventListener("DOMContentLoaded", function () {
+
+    const subjectSelect = document.getElementById("subjectSelect");
+    const descriptionSelect = document.getElementById("descriptionSelect");
     const addTaskButton = document.getElementById("addTaskButton");
-    const taskInput = document.getElementById("taskInput");
     const taskList = document.getElementById("taskList");
 
-    // Carregar tarefas salvas ao abrir o site
-    function loadTasks() {
-        const savedTasks = JSON.parse(localStorage.getItem("tasks")) || [];
-        savedTasks.forEach(task => {
-            addTaskToList(task.text, task.completed);
+    document.addEventListener("DOMContentLoaded", function () {
+        const subjectSelect = document.getElementById("subjectSelect");
+        const descriptionSelect = document.getElementById("descriptionSelect");
+        const addTaskButton = document.getElementById("addTaskButton");
+        const taskList = document.getElementById("taskList");
+    
+        function atualizarSelects() {
+            subjectSelect.innerHTML = '<option value="" disabled selected>Selecione a matéria...</option>';
+            descriptionSelect.innerHTML = '<option value="" disabled selected>Selecione a descrição...</option>';
+            descriptionSelect.disabled = true;
+    
+            const cards = document.querySelectorAll(".card");
+            const materiasSet = new Set();
+            const descricoesMap = {};
+    
+            cards.forEach(card => {
+                const materia = card.querySelector("h4").textContent.trim();
+                const descricao = card.querySelector(".card-description").textContent.trim();
+    
+                if (materia) materiasSet.add(materia);
+                if (materia && descricao) {
+                    if (!descricoesMap[materia]) descricoesMap[materia] = [];
+                    descricoesMap[materia].push(descricao);
+                }
+            });
+    
+            materiasSet.forEach(materia => {
+                const option = document.createElement("option");
+                option.value = materia;
+                option.textContent = materia;
+                subjectSelect.appendChild(option);
+            });
+    
+            subjectSelect.addEventListener("change", function () {
+                const selectedSubject = subjectSelect.value;
+                descriptionSelect.innerHTML = '<option value="" disabled selected>Selecione a descrição...</option>';
+    
+                if (descricoesMap[selectedSubject]) {
+                    descricoesMap[selectedSubject].forEach(desc => {
+                        const option = document.createElement("option");
+                        option.value = desc;
+                        option.textContent = desc;
+                        descriptionSelect.appendChild(option);
+                    });
+    
+                    descriptionSelect.disabled = false;
+                } else {
+                    descriptionSelect.disabled = true;
+                }
+            });
+        }
+    
+        function salvarTarefas() {
+            const tarefas = [];
+            document.querySelectorAll("#taskList li").forEach(li => {
+                const textoTarefa = li.firstChild.textContent.trim(); // Remove o botão "X"
+                tarefas.push(textoTarefa);
+            });
+            localStorage.setItem("tarefas", JSON.stringify(tarefas));
+        }
+    
+        function carregarTarefas() {
+            const tarefasSalvas = JSON.parse(localStorage.getItem("tarefas")) || [];
+            tarefasSalvas.forEach(tarefa => {
+                adicionarTarefaNaLista(tarefa);
+            });
+        }
+    
+        function adicionarTarefaNaLista(tarefaTexto) {
+            // Verificar se a tarefa já existe na lista
+            const tarefasExistentes = Array.from(taskList.children).map(li => li.firstChild.textContent.trim());
+    
+            if (tarefasExistentes.includes(tarefaTexto)) {
+                alert("Esta tarefa já foi adicionada.");
+                return;
+            }
+    
+            const li = document.createElement("li");
+            li.textContent = tarefaTexto;
+    
+            // Criando botão de remover (X)
+            const removeButton = document.createElement("button");
+            removeButton.textContent = "X";
+            removeButton.classList.add("remove-btn");
+            removeButton.addEventListener("click", function () {
+                li.remove();
+                salvarTarefas();
+            });
+    
+            li.appendChild(removeButton);
+            taskList.appendChild(li);
+        }
+    
+        // Adicionar tarefa ao clicar no botão
+        addTaskButton.addEventListener("click", function () {
+            const selectedSubject = subjectSelect.value;
+            const selectedDescription = descriptionSelect.value;
+    
+            if (selectedSubject && selectedDescription) {
+                const tarefaTexto = `${selectedSubject}: ${selectedDescription}`;
+                adicionarTarefaNaLista(tarefaTexto);
+                salvarTarefas();
+            } else {
+                alert("Por favor, selecione a matéria e a descrição.");
+            }
         });
-    }
-
-    // Adicionar nova tarefa ao clicar no botão
-    addTaskButton.addEventListener("click", function () {
-        const taskText = taskInput.value.trim();
-        if (taskText !== "") {
-            addTaskToList(taskText);
-            saveTasks();
-            taskInput.value = "";
-        }
-    });
-
-    taskInput.addEventListener("keydown", function (event) {
-        if (event.key === "Enter") {
-            addTaskButton.click();
-        }
+    
+        atualizarSelects();
+        carregarTarefas();
+    
+        // Atualizar selects automaticamente se os cards mudarem
+        const observer = new MutationObserver(() => {
+            atualizarSelects();
+        });
+    
+        document.querySelectorAll(".card").forEach(card => {
+            observer.observe(card, { childList: true, subtree: true, characterData: true });
+        });
     });
     
-
-    // Função para adicionar a tarefa ao HTML
-    function addTaskToList(text, completed = false) {
-        const taskItem = document.createElement("li");
-        taskItem.textContent = text;
-        taskItem.classList.add("task-item");
-
-        // Se a tarefa estiver concluída, adiciona a classe correspondente
-        if (completed) {
-            taskItem.classList.add("completed");
-        }
-
-        // Alternar entre concluído/não concluído ao clicar
-        taskItem.addEventListener("click", function () {
-            taskItem.classList.toggle("completed");
-            saveTasks();
-        });
-
-        // Criar botão de remover tarefa
-        const removeButton = document.createElement("button");
-        removeButton.textContent = "X";
-        removeButton.classList.add("remove-btn"); // Garantir que tenha a classe 'remove-btn'
-        removeButton.addEventListener("click", function () {
-            taskItem.remove();
-            saveTasks();
-        });
-
-        // Adicionar botão ao item da lista
-        taskItem.appendChild(removeButton);
-        taskList.appendChild(taskItem);
-    }
-
-    // Salvar tarefas no LocalStorage
-    function saveTasks() {
-        const tasks = [];
-        document.querySelectorAll(".task-item").forEach(task => {
-            tasks.push({
-                text: task.firstChild.textContent.trim(),
-                completed: task.classList.contains("completed")
-            });
-        });
-        localStorage.setItem("tasks", JSON.stringify(tasks));
-    }
-
-    loadTasks();
-});
-
+    
 
 //Abrir lição calendário
 
@@ -145,3 +196,34 @@ document.addEventListener("DOMContentLoaded", function () {
         showAllButton.style.display = "none"; // Oculta o botão novamente
     });
 });
+
+//Verificar lição repitida
+document.getElementById("addTaskButton").addEventListener("click", function () {
+    let taskInput = document.getElementById("taskInput").value.trim();
+    let taskDate = document.getElementById("task-date").value;
+    let taskList = document.getElementById("taskList");
+    
+    if (taskInput === "") {
+        alert("Por favor, insira uma tarefa válida!");
+        return;
+    }
+    
+    // Verifica se a tarefa já existe na lista
+    let tasks = document.querySelectorAll("#taskList li");
+    for (let task of tasks) {
+        if (task.textContent === taskInput) {
+            alert("Essa tarefa já foi adicionada!");
+            return;
+        }
+    }
+    
+    // Cria um novo item na lista
+    let listItem = document.createElement("li");
+    listItem.textContent = taskInput + (taskDate ? " (Para: " + taskDate + ")" : "");
+    taskList.appendChild(listItem);
+    
+    // Limpa o campo de entrada
+    document.getElementById("taskInput").value = "";
+    document.getElementById("task-date").value = "";
+});
+
