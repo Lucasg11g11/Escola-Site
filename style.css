@@ -364,6 +364,10 @@ select:focus {
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Sombra para chamar atenção */
 }
 
+.destaque {
+    background-color: red !important;
+    color: white;
+}
 
 #Lição1 {
     display: visible;
