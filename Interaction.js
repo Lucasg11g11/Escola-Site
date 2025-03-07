@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function atualizarSelects() {
         subjectSelect.innerHTML = '<option value="" disabled selected>Selecione a matéria...</option>';
-        descriptionSelect.innerHTML = '<option value="" disabled selected>Selecione a descrição...</option>';
+        descriptionSelect.innerHTML = '<option value="" disabled selected>Selecione a Lição</option>';
         descriptionSelect.disabled = true;
 
         const materiasSet = new Set();
@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         subjectSelect.addEventListener("change", function () {
             const selectedSubject = subjectSelect.value;
-            descriptionSelect.innerHTML = '<option value="" disabled selected>Selecione a descrição...</option>';
+            descriptionSelect.innerHTML = '<option value="" disabled selected>Selecione a lição</option>';
 
             if (descricoesMap[selectedSubject]) {
                 descricoesMap[selectedSubject].forEach(desc => {
@@ -119,7 +119,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const tarefaTexto = `${selectedSubject}: ${selectedDescription}`;
             adicionarTarefaNaLista(tarefaTexto);
         } else {
-            alert("Por favor, selecione a matéria e a descrição.");
+            alert("Por favor, selecione a matéria e a lição.");
         }
     });
 
