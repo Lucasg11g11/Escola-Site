@@ -254,4 +254,3 @@ document.getElementById("addTaskButton").addEventListener("click", function () {
     document.getElementById("taskInput").value = "";
     document.getElementById("task-date").value = "";
 });
-
