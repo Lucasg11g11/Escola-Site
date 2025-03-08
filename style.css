@@ -1,32 +1,4 @@
-.cards-container {
-    display: flex;
-    flex-wrap: wrap; /* Permite quebrar linha se necessário */
-    justify-content: center; /* Centraliza horizontalmente */
-    align-items: center; /* Centraliza verticalmente */
-    gap: 20px; /* Espaçamento entre os cards */
-    padding: 20px;
-}
-
-/* Resetando margens e padding */
-.cardbutton{
-    background-color: #3498db;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-}
-
-.cardbutton:hover {
-    background-color: #2980b9;
-}
-
-.custom-button:hover {
-    background-color: #2980b9;
-}
-
+/* Configuração geral */
 * {
     margin: 0;
     padding: 0;
@@ -36,7 +8,7 @@
 /* Estilizando o corpo da página */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f9;
+    background-color: #f4f7fb; /* Fundo mais claro com tons suaves de azul */
     color: #333;
     line-height: 1.6;
     text-align: center;
@@ -79,59 +51,107 @@ p {
     text-align: center;
 }
 
-/* Container para adicionar tarefas */
-.task-container {
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin-bottom: 40px;
-    width: 100%;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-/* Título dentro do container */
-.task-container h2 {
-    color: #2c3e50;
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-/* Input de texto */
-.task-container input[type="text"] {
-    width: 100%; /* O campo de texto ocupa toda a largura disponível */
-    padding: 10px;
-    font-size: 1em;
-    border: 2px solid #ccc;
+/* Estilizando os botões */
+.cardbutton {
+    background-color: #3498db;
+    color: white;
+    padding: 10px 20px;
+    border: 2px solid #2980b9; /* Borda azul */
     border-radius: 5px;
-    margin-bottom: 10px; /* Espaço entre o campo de texto e o botão */
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
-/* Botão */
-/* Estilo para o botão de adicionar tarefa */
+.cardbutton:hover {
+    background-color: #2980b9;
+    border-color: #1f6fa6; /* Borda mais escura */
+}
+
+.cardbutton:active {
+    background-color: #1f6fa6;
+}
+
+.cardbutton:focus {
+    outline: none;
+}
+
+/* Estilo de borda para os botões de adicionar */
 .task-container button.add-btn {
     background-color: #3498db;
     color: white;
     padding: 10px 20px;
-    border: none;
+    border: 2px solid #2980b9;
     border-radius: 5px;
     cursor: pointer;
     font-size: 1rem;
-    width: auto; /* Ajustado para não ocupar toda a largura */
-    margin-top: 10px; /* Um pequeno espaço acima do botão */
+    width: auto;
+    margin-top: 10px;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
-/* Alterando a cor do botão de adicionar no hover */
 .task-container button.add-btn:hover {
     background-color: #2980b9;
+    border-color: #1f6fa6;
 }
 
-/* Estilo para o botão de remover tarefa (X) */
+.task-container button.add-btn:active {
+    background-color: #1f6fa6;
+}
+
+.task-container button.add-btn:focus {
+    outline: none;
+}
+
+/* Caixa de seleção */
+select {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 2px solid #3498db; /* Borda azul */
+    border-radius: 5px;
+    font-size: 16px;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+select:focus {
+    border-color: #2980b9; /* Azul mais escuro ao focar */
+    outline: none;
+    background-color: #fff;
+}
+
+/* Estilo para o botão "Mostrar todas as lições" */
+.show-all-btn {
+    background-color: #3498db;
+    color: white;
+    padding: 10px 20px;
+    border: 2px solid #2980b9;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    margin-top: 10px;
+}
+
+.show-all-btn:hover {
+    background-color: #2980b9;
+    border-color: #1f6fa6;
+}
+
+.show-all-btn:active {
+    background-color: #1f6fa6;
+}
+
+.show-all-btn:focus {
+    outline: none;
+}
+
+/* Estilo para o botão de remover tarefa */
 .remove-btn {
     background-color: transparent;
-    color: #e74c3c; /* Vermelho */
+    color: #e74c3c;
     border: none;
     font-size: 16px;
     cursor: pointer;
@@ -139,8 +159,8 @@ p {
     height: 20px;
     padding: 0;
     border-radius: 50%;
-    margin-left: 10px; /* Distância do botão X em relação ao texto */
-    display: inline-flex; /* Usar inline-flex para manter alinhado com o texto */
+    margin-left: 10px;
+    display: inline-flex;
     justify-content: center;
     align-items: center;
     line-height: 1;
@@ -151,27 +171,6 @@ p {
     background-color: #f1f1f1;
     color: #c0392b;
 }
-
-/* Estilo para a lista de tarefas */
-.task-container ul {
-    list-style: none;
-    padding-left: 0;
-    margin-top: 20px;
-}
-
-/* Tarefas individuais */
-.task-container ul li {
-    background-color: #ecf0f1;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    font-size: 1rem;
-    text-align: left;
-    display: flex; /* Flexbox para alinhar o texto e o botão X */
-    justify-content: space-between; /* Espaçar texto e botão X */
-    align-items: center; /* Alinhar verticalmente */
-}
-
 
 /* Estilizando o calendário */
 .calendar {
@@ -194,8 +193,6 @@ input[type="date"] {
     margin-top: 10px;
 }
 
-/* Removendo a estilização do cartão de lição */
-
 /* Estilizando o cartão de lição */
 .card {
     background: #fff;
@@ -207,6 +204,7 @@ input[type="date"] {
     margin: 20px auto;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     text-align: center;
+    border: 2px solid #27ae60; /* Borda verde */
 }
 
 .card:hover {
@@ -214,6 +212,14 @@ input[type="date"] {
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
+/* Estilo para o card destacado (highlighted) */
+.card.highlighted {
+    border: 2px solid #e74c3c; /* Borda vermelha */
+    background-color: #f8d7da; /* Fundo claro com tom vermelho */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra destacando */
+}
+
+/* Estilizando a imagem do card */
 .card-image {
     width: 100%;
     height: 200px;
@@ -254,84 +260,75 @@ input[type="date"] {
     background-color: #004a8c;
 }
 
-/* Estilo básico para o botão "Mostrar todas as lições" */
-.show-all-btn {
-    background-color: #4CAF50; /* Cor de fundo verde */
-    color: white; /* Texto branco */
-    padding: 10px 20px; /* Espaçamento interno */
-    border: none; /* Remove borda */
-    border-radius: 5px; /* Cantos arredondados */
-    font-size: 16px; /* Tamanho da fonte */
-    cursor: pointer; /* Aponta para o cursor em forma de mão */
-    transition: background-color 0.3s ease; /* Transição suave ao passar o mouse */
-    margin-top: 10px; /* Espaço acima do botão */
+/* Estilizando a área de selecionar tarefas (tasks) */
+.task-container {
+    background-color: #ecf0f1; /* Fundo suave e claro */
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 20px;
+    margin-bottom: 40px; /* Espaçamento na parte inferior para evitar que fique colado */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra leve */
 }
 
-/* Efeito ao passar o mouse (hover) */
-.show-all-btn:hover {
-    background-color: #45a049; /* Cor de fundo mais escura ao passar o mouse */
+.task-container h2 {
+    font-size: 1.5rem;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    text-align: center;
 }
 
-/* Efeito ao pressionar o botão (active) */
-.show-all-btn:active {
-    background-color: #388e3c; /* Cor ainda mais escura ao pressionar */
-}
-
-/* Estilo para o botão quando estiver invisível (inicialmente) */
-.show-all-btn[style*="display: none"] {
-    display: none; /* Garante que o botão esteja oculto quando não necessário */
-}
-
-/* Caixa de seleção */
-select {
-    width: 100%;
+.task-container input[type="text"] {
+    width: 100%; /* O campo de texto ocupa toda a largura disponível */
     padding: 10px;
-    margin: 10px 0;
-    border: 2px solid #4CAF50; /* Borda verde */
+    font-size: 1em;
+    border: 2px solid #3498db; /* Borda azul */
     border-radius: 5px;
-    font-size: 16px;
-    background-color: #f9f9f9;
-    cursor: pointer;
-    transition: 0.3s;
+    margin-bottom: 10px; /* Espaço entre o campo de texto e o botão */
+    transition: border-color 0.3s ease;
 }
 
-select:focus {
-    border-color: #388E3C; /* Verde mais escuro ao focar */
+.task-container input[type="text"]:focus {
+    border-color: #2980b9;
     outline: none;
-    background-color: #fff;
 }
 
-/* Botão de adicionar */
-.add-btn {
-    width: 100%;
-    padding: 12px;
-    background-color: #4CAF50; /* Verde bonito */
+/* Botão de adicionar tarefa */
+.task-container button.add-btn {
+    background-color: #3498db;
     color: white;
-    font-size: 16px;
-    border: none;
+    padding: 10px 20px;
+    border: 2px solid #2980b9;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    font-size: 1rem;
+    width: 100%; /* Ajustado para não ocupar toda a largura */
+    margin-top: 10px; /* Um pequeno espaço acima do botão */
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
-.add-btn:hover {
-    background-color: #388E3C; /* Cor mais escura ao passar o mouse */
+.task-container button.add-btn:hover {
+    background-color: #2980b9;
+    border-color: #1f6fa6;
 }
 
-/* Lista de tarefas */
-#taskList {
+.task-container button.add-btn:active {
+    background-color: #1f6fa6;
+}
+
+/* Estilizando a lista de tarefas */
+.task-container ul {
     list-style: none;
-    padding: 0;
-    margin-top: 15px;
+    padding-left: 0;
+    margin-top: 20px;
 }
 
-#taskList li {
-    background: #fff;
+.task-container ul li {
+    background-color: #fff;
     padding: 10px;
-    margin: 5px 0;
-    border-left: 5px solid #4CAF50; /* Marca verde na lateral */
+    margin-bottom: 10px;
+    border-left: 5px solid #3498db; /* Borda azul para as tarefas */
     border-radius: 5px;
-    font-size: 16px;
+    font-size: 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -351,18 +348,9 @@ select:focus {
     color: darkred;
 }
 
-/* CSS para destacar o card */
-.card.highlighted {
-    border: 2px solid rgb(255, 0, 0); /* Cor verde para destacar */
-    background-color: #f0f8f0; /* Fundo levemente verde */
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Sombra para chamar atenção */
-}
 
-.card {
-    border: 2px solid rgb(0, 255, 0); /* Cor verde para destacar */
-    background-color: #f0f8f0; /* Fundo levemente verde */
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Sombra para chamar atenção */
-}
+
+
 
 
 #Lição1 {
