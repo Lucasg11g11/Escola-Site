@@ -402,11 +402,11 @@ input[type="date"] {
 }
 
 #Tc1 {
-    display: visible;
+    display: none;
 }
 
 #Tc2 {
-    display: none;
+    display: visible;
 }
 
 #Tc3 {
