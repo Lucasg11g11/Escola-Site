@@ -358,7 +358,7 @@ input[type="date"] {
 }
 
 #Lição2 {
-    display: visible;
+    display: nome;
 }
 
 #Lição3 {
@@ -366,7 +366,7 @@ input[type="date"] {
 }
 
 #Lição4 {
-    display: visible;
+    display: none;
 }
 
 #Lição5 {
@@ -374,7 +374,7 @@ input[type="date"] {
 }
 
 #Lição6 {
-    display: visible;
+    display: none;
 }
 
 #Lição7 {
