@@ -1,256 +1,585 @@
-document.addEventListener("DOMContentLoaded", function () {
-    const subjectSelect = document.getElementById("subjectSelect");
-    const descriptionSelect = document.getElementById("descriptionSelect");
-    const addTaskButton = document.getElementById("addTaskButton");
-    const taskList = document.getElementById("taskList");
-    const dateInput = document.getElementById("task-date");
-    const cards = document.querySelectorAll(".card");
+// =====================================================================
+// LÓGICA DA AGENDA VIRTUAL (pt-BR)
+// - Gerencia criação, edição, exclusão e listagem de tarefas
+// - Persiste dados no localStorage
+// - Filtros: pendentes, concluídas, por tipo, busca por título
+// - Ordenação por data de entrega (asc/desc)
+// - Destaque para tarefas atrasadas
+// - Exportação/Importação de JSON
+// - Drag & Drop para reordenar
+// - Tema claro/escuro persistente
+// - Barra de progresso (concluídas / total)
+// - Data e hora dinâmicas no cabeçalho
+// =====================================================================
 
-    function atualizarSelects() {
-        subjectSelect.innerHTML = '<option value="" disabled selected>Selecione a matéria...</option>';
-        descriptionSelect.innerHTML = '<option value="" disabled selected>Selecione a Lição</option>';
-        descriptionSelect.disabled = true;
+/** Chave base para o localStorage */
+const STORAGE_KEY = "agenda_virtual_v1";
 
-        const materiasSet = new Set();
-        const descricoesMap = {};
+/** Estado global simples da aplicação */
+const state = {
+  tarefas: [],       // Array de tarefas ({id, titulo, descricao, dataEntrega, pagina, tipo, status, imagem, icone, createdAt, order})
+  filtro: "todas",   // "todas" | "pendentes" | "concluidas" | "tipo:<nome>"
+  busca: "",         // texto de busca por título
+  ordenacao: "asc",  // "asc" | "desc"
+  tema: "claro",     // "claro" | "escuro"
+};
 
-        cards.forEach(card => {
-            const materia = card.querySelector("h4")?.textContent.trim();
-            const descricao = card.querySelector(".card-description")?.textContent.trim();
+// ============================ Utilidades ==============================
 
-            if (materia) materiasSet.add(materia);
-            if (materia && descricao) {
-                if (!descricoesMap[materia]) descricoesMap[materia] = [];
-                descricoesMap[materia].push(descricao);
-            }
-        });
+/** Gera um ID único simples */
+function uid() {
+  return Math.random().toString(36).slice(2) + Date.now().toString(36);
+}
 
-        materiasSet.forEach(materia => {
-            const option = document.createElement("option");
-            option.value = materia;
-            option.textContent = materia;
-            subjectSelect.appendChild(option);
-        });
+/** Lê e grava no localStorage */
+function salvarLocal() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    tarefas: state.tarefas,
+    tema: state.tema,
+  }));
+}
+function carregarLocal() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    state.tarefas = Array.isArray(data.tarefas) ? data.tarefas : [];
+    state.tema = data.tema === "escuro" ? "escuro" : "claro";
+  } catch (e) {
+    console.error("Erro ao carregar storage:", e);
+  }
+}
 
-        subjectSelect.addEventListener("change", function () {
-            const selectedSubject = subjectSelect.value;
-            descriptionSelect.innerHTML = '<option value="" disabled selected>Selecione a lição</option>';
+/** Formata data (YYYY-MM-DD -> dd/mm/aaaa) */
+function formatarData(iso) {
+  if (!iso) return "";
+  const [y, m, d] = iso.split("-").map(Number);
+  return `${String(d).padStart(2,"0")}/${String(m).padStart(2,"0")}/${y}`;
+}
 
-            if (descricoesMap[selectedSubject]) {
-                descricoesMap[selectedSubject].forEach(desc => {
-                    const option = document.createElement("option");
-                    option.value = desc;
-                    option.textContent = desc;
-                    descriptionSelect.appendChild(option);
-                });
+/** Verifica se a tarefa está atrasada (apenas se pendente) */
+function estaAtrasada(t) {
+  if (t.status !== "pendente") return false;
+  try {
+    const hoje = new Date();
+    hoje.setHours(0,0,0,0);
+    const dt = new Date(t.dataEntrega);
+    dt.setHours(0,0,0,0);
+    return dt < hoje;
+  } catch { return false; }
+}
 
-                descriptionSelect.disabled = false;
-            } else {
-                descriptionSelect.disabled = true;
-            }
-        });
-    }
+/** Atualiza barra de progresso */
+function atualizarProgresso() {
+  const total = state.tarefas.length;
+  const concluidas = state.tarefas.filter(t => t.status === "concluida").length;
+  const pct = total ? Math.round((concluidas / total) * 100) : 0;
+  document.getElementById("progressoTexto").textContent = `${concluidas} de ${total} concluídas`;
+  const barra = document.getElementById("progressoBarra");
+  barra.style.width = pct + "%";
+  const wrapper = barra.parentElement;
+  wrapper.setAttribute("aria-valuenow", String(pct));
+}
 
-    function salvarTarefas() {
-        const tarefas = [];
-        document.querySelectorAll("#taskList li").forEach(li => {
-            tarefas.push(li.firstChild.textContent.trim());
-        });
-        localStorage.setItem("tarefas", JSON.stringify(tarefas));
-    }
+/** Atualiza relógio no cabeçalho */
+function iniciarRelogio() {
+  const el = document.getElementById("relogio");
+  function tick() {
+    const agora = new Date();
+    const data = agora.toLocaleDateString("pt-BR", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+    const hora = agora.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    el.textContent = `${data} — ${hora}`;
+  }
+  tick();
+  setInterval(tick, 1000);
+}
 
-    function carregarTarefas() {
-        const tarefasSalvas = JSON.parse(localStorage.getItem("tarefas")) || [];
-        tarefasSalvas.forEach(tarefa => {
-            adicionarTarefaNaLista(tarefa);
-        });
-    }
+/** Aplica o tema salvo */
+function aplicarTema() {
+  document.body.classList.toggle("dark", state.tema === "escuro");
+}
 
-    function adicionarTarefaNaLista(tarefaTexto) {
-        const tarefasExistentes = Array.from(taskList.children).map(li => li.firstChild.textContent.trim());
+// ============================ Renderização ===========================
 
-        if (tarefasExistentes.includes(tarefaTexto)) {
-            alert("Esta tarefa já foi adicionada.");
-            return;
-        }
+const navButtons = document.querySelectorAll('.nav-btn');
 
-        const li = document.createElement("li");
-        li.textContent = tarefaTexto;
-
-        const removeButton = document.createElement("button");
-        removeButton.textContent = "X";
-        removeButton.classList.add("remove-btn");
-        removeButton.addEventListener("click", function () {
-            li.remove();
-            removerDestaque(tarefaTexto);
-            salvarTarefas();
-        });
-
-        li.appendChild(removeButton);
-        taskList.appendChild(li);
-        destacarCardPorTarefa(tarefaTexto);
-        salvarTarefas();
-    }
-
-    function destacarCardPorTarefa(tarefaTexto) {
-        cards.forEach(card => {
-            const cardMateria = card.querySelector("h4")?.textContent.trim();
-            const cardDescricao = card.querySelector(".card-description")?.textContent.trim();
-            if (tarefaTexto.includes(cardMateria) && tarefaTexto.includes(cardDescricao)) {
-                card.classList.add("highlighted");
-            }
-        });
-    }
-
-    function removerDestaque(tarefaTexto) {
-        cards.forEach(card => {
-            const cardMateria = card.querySelector("h4")?.textContent.trim();
-            const cardDescricao = card.querySelector(".card-description")?.textContent.trim();
-            if (tarefaTexto.includes(cardMateria) && tarefaTexto.includes(cardDescricao)) {
-                card.classList.remove("highlighted");
-            }
-        });
-    }
-
-    addTaskButton.addEventListener("click", function () {
-        const selectedSubject = subjectSelect.value;
-        const selectedDescription = descriptionSelect.value;
-        if (selectedSubject && selectedDescription) {
-            const tarefaTexto = `${selectedSubject}: ${selectedDescription}`;
-            adicionarTarefaNaLista(tarefaTexto);
-        } else {
-            alert("Por favor, selecione a matéria e a lição.");
-        }
-    });
-
-    function filtrarPorData() {
-        const selectedDate = dateInput.value.split("-").reverse().join("/"); 
-        let hasMatch = false;
-        cards.forEach(card => {
-            const dueDateElement = card.querySelector(".para");
-            if (dueDateElement) {
-                let dueDate = dueDateElement.textContent.trim().replace("Para ", "");
-                if (dueDate === selectedDate) {
-                    card.style.display = "block";
-                    hasMatch = true;
-                } else {
-                    card.style.display = "none";
-                }
-            }
-        });
-
-        if (!hasMatch) {
-            cards.forEach(card => card.style.display = "block");
-            alert("Nenhuma tarefa encontrada para essa data.");
-        }
-    }
-
-    dateInput.addEventListener("change", filtrarPorData);
-
-    atualizarSelects();
-    carregarTarefas();
+navButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    // Remove active de todos
+    navButtons.forEach(b => b.classList.remove('active'));
+    // Adiciona active só no clicado
+    btn.classList.add('active');
+  });
 });
 
-    
-    
 
-//Abrir lição calendário
+/** Cria o elemento de cartão a partir de uma tarefa */
+function criarCard(tarefa) {
+  const tpl = document.getElementById("cardTemplate");
+  const node = tpl.content.firstElementChild.cloneNode(true);
 
-document.addEventListener("DOMContentLoaded", function () {
-    const dateInput = document.getElementById("task-date");
-    const cards = document.querySelectorAll(".card");
-    const showAllButton = document.createElement("button");
+  node.dataset.id = tarefa.id;
 
-    // Configuração do botão "Mostrar todas as lições"
-    showAllButton.textContent = "Mostrar todas as lições";
-    showAllButton.style.display = "none"; // Inicialmente oculto
-    showAllButton.classList.add("show-all-btn"); // Adiciona uma classe para estilização
+  // Aplica borda colorida se for pré-anotada
+  if (tarefa.tipo === "pre-anotadas") {
+    node.classList.add("tipo-pre-anotadas");
 
-    // Insere o botão abaixo do calendário
-    dateInput.parentElement.appendChild(showAllButton);
+    if (tarefa.status === "pendente") {
+      node.style.border = "3px solid #e74c3c"; // vermelho
+      node.style.boxShadow = "0 0 10px rgba(231, 76, 60, 0.5)";
+    } else if (tarefa.status === "concluida") {
+      node.style.border = "3px solid #2ecc71"; // verde
+      node.style.boxShadow = "0 0 10px rgba(46, 204, 113, 0.5)";
+    }
+  }
 
-    dateInput.addEventListener("change", function () {
-        const selectedDate = this.value.split("-").reverse().join("/"); // Converte 'YYYY-MM-DD' para 'DD/MM/YYYY'
-        let hasMatch = false;
+  // Imagem ou ícone
+  const imgWrap = node.querySelector(".card-image");
+  imgWrap.innerHTML = "";
+  if (tarefa.imagem) {
+    const img = new Image();
+    img.src = tarefa.imagem;
+    img.alt = "Imagem da tarefa";
+    img.loading = "lazy";
+    imgWrap.appendChild(img);
+  } else if (tarefa.icone) {
+    imgWrap.textContent = tarefa.icone;
+  } else {
+    imgWrap.textContent = "📚";
+  }
 
-        cards.forEach(card => {
-            const dueDateElement = card.querySelector(".para");
-            const descriptionElement = card.querySelector(".card-description");
+  // Conteúdo
+  node.querySelector(".card-title").textContent = tarefa.titulo;
+  node.querySelector(".badge.tipo").textContent = tarefa.tipo;
+  node.querySelector(".card-desc").textContent = tarefa.descricao || "—";
+  node.querySelector(".vencimento").textContent = formatarData(tarefa.dataEntrega);
+  node.querySelector(".pagina").textContent = tarefa.pagina;
+  node.querySelector(".status").textContent = tarefa.status === "concluida" ? "Concluída" : "Pendente";
 
-            if (dueDateElement && descriptionElement) {
-                let dueDate = dueDateElement.textContent.trim().replace("Para ", ""); // Remove "Para "
-                let description = descriptionElement.textContent.trim(); // Obtém a descrição
+  // Atraso?
+  if (estaAtrasada(tarefa)) {
+    node.setAttribute("aria-invalid", "true");
+    node.title = "Tarefa atrasada";
+  }
 
-                if (dueDate === selectedDate && description !== "") {
-                    card.style.display = "block"; // Exibe o card se a data for correspondente e a descrição estiver preenchida
-                    hasMatch = true;
-                } else {
-                    card.style.display = "none"; // Esconde os cards inválidos
-                }
-            }
-        });
+  // Botões
+  node.querySelector(".toggle-status").addEventListener("click", () => alternarStatus(tarefa.id));
+  node.querySelector(".editar").addEventListener("click", () => abrirModalEdicao(tarefa.id));
+  node.querySelector(".excluir").addEventListener("click", () => excluirTarefa(tarefa.id));
 
-        // Se não houver lições para a data, exibe todos os cards com descrição
-        if (!hasMatch) {
-            cards.forEach(card => {
-                const descriptionElement = card.querySelector(".card-description");
-                if (descriptionElement && descriptionElement.textContent.trim() !== "") {
-                    card.style.display = "block"; // Exibe cards com descrição
-                }
-            });
-            alert("Tente novamente");
-        }
+  // Drag & Drop
+  node.addEventListener("dragstart", handleDragStart);
+  node.addEventListener("dragover", handleDragOver);
+  node.addEventListener("drop", handleDrop);
+  node.addEventListener("dragend", handleDragEnd);
 
-        // Exibe o botão "Mostrar todas as lições" somente se houver lições encontradas
-        if (hasMatch) {
-            showAllButton.style.display = "block";
-        } else {
-            showAllButton.style.display = "none";
-        }
-    });
+  return node;
+}
 
-    // Evento do botão para exibir novamente apenas os cards com lições válidas e resetar a data
-    showAllButton.addEventListener("click", function () {
-        cards.forEach(card => {
-            const descriptionElement = card.querySelector(".card-description");
-            if (descriptionElement && descriptionElement.textContent.trim() !== "") {
-                card.style.display = "block"; // Apenas os cards com lições são exibidos
-            }
-        });
 
-        // Reseta o campo de data
-        dateInput.value = ""; // Limpa o campo de data
+function adicionarTarefasFixas() {
+  // Checa se já existe alguma tarefa do tipo 'pre-anotadas'
+  const existemFixas = state.tarefas.some(t => t.origem === "pre-anotadas");
+  if (existemFixas) return;
 
-        showAllButton.style.display = "none"; // Oculta o botão novamente
-    });
+  const fixas = [
+    {
+      titulo: "Lição de Matemática",
+      descricao: "Lição Básica de Matemática sobre termos semelhantes e expressões algébricas.",
+      dataEntrega: "2025-08-19",
+      pagina: "p.433 ex 14 e 15",
+      tipo: "Lição Comum",
+      status: "pendente",
+      icone: "🧮",
+      origem: "pre-anotadas",
+    },
+    {
+      titulo: "Lição de Geografia",
+      descricao: "Lição Sobre mineração e recursos naturais.",
+      dataEntrega: "2025-08-20",
+      pagina: "p.250 ex 2 e 3",
+      tipo: "Lição Comum",
+      status: "pendente",
+      icone: "🌍",
+      origem: "pre-anotadas",
+    },
+    {
+      titulo: "Trabalho de Artes",
+      descricao: "Fazer uma maquete de uma casa",
+      dataEntrega: "2025-08-21",
+      tipo: "Trabalho",
+      status: "pendente",
+      icone: "🌍",
+      origem: "pre-anotadas",
+    },
+  ];
+
+  fixas.forEach(dados => adicionarTarefa(dados));
+}
+
+/** Renderiza todas as tarefas conforme filtros/ordenação/pesquisa */
+function render() {
+  const lista = document.getElementById("listaTarefas");
+  lista.innerHTML = "";
+
+  // Filtragem por aba
+  let tarefas = [...state.tarefas];
+
+  if (state.filtro === "pendentes") {
+    tarefas = tarefas.filter(t => t.status === "pendente");
+  } else if (state.filtro === "concluidas") {
+    tarefas = tarefas.filter(t => t.status === "concluida");
+  } else if (state.filtro === "pre-anotadas") {
+    tarefas = tarefas.filter(t => t.origem === "pre-anotadas");
+  } else if (state.filtro === "minhas-lições") {
+    tarefas = tarefas.filter(t => t.origem === "minhas-lições");
+  } else if (state.filtro.startsWith("tipo:")) {
+    const tipo = state.filtro.split(":")[1];
+    tarefas = tarefas.filter(t => t.tipo === tipo);
+  }
+
+
+  // Busca por título
+  if (state.busca.trim()) {
+    const q = state.busca.trim().toLowerCase();
+    tarefas = tarefas.filter(t => t.titulo.toLowerCase().includes(q));
+  }
+
+  // Ordenação por data
+  tarefas.sort((a, b) => {
+    // primeiro por 'order' (drag-and-drop), depois por data (quando iguais)
+    if (a.order !== b.order) return a.order - b.order;
+    const da = new Date(a.dataEntrega).getTime();
+    const db = new Date(b.dataEntrega).getTime();
+    return state.ordenacao === "asc" ? da - db : db - da;
+  });
+
+  // Monta DOM
+  const frag = document.createDocumentFragment();
+  tarefas.forEach(t => frag.appendChild(criarCard(t)));
+  lista.appendChild(frag);
+
+  // Atualiza progresso
+  atualizarProgresso();
+}
+
+// ============================ CRUD ===================================
+
+/** Adiciona nova tarefa */
+function adicionarTarefa(dados) {
+  const nova = {
+    id: uid(),
+    titulo: dados.titulo.trim(),
+    descricao: (dados.descricao || "").trim(),
+    dataEntrega: dados.dataEntrega,
+    pagina: dados.pagina.trim(),
+    tipo: dados.tipo,
+    status: dados.status, // "pendente" | "concluida"
+    imagem: dados.imagem || null, // dataURL
+    icone: dados.icone || null,   // emoji
+    createdAt: Date.now(),
+    order: state.tarefas.length ? Math.max(...state.tarefas.map(t => t.order || 0)) + 1 : 1,
+    origem: dados.origem// padrão para novas tarefas
+  };
+  state.tarefas.push(nova);
+  salvarLocal();
+  render();
+}
+
+/** Atualiza tarefa existente */
+function atualizarTarefa(id, dados) {
+  const idx = state.tarefas.findIndex(t => t.id === id);
+  if (idx === -1) return;
+  const t = state.tarefas[idx];
+  state.tarefas[idx] = {
+    ...t,
+    titulo: dados.titulo.trim(),
+    descricao: (dados.descricao || "").trim(),
+    dataEntrega: dados.dataEntrega,
+    pagina: dados.pagina.trim(),
+    tipo: dados.tipo,
+    status: dados.status,
+    // Mantém imagem/ícone a menos que o usuário forneça novo
+    imagem: dados.imagem !== undefined ? dados.imagem : t.imagem,
+    icone: dados.icone !== undefined ? dados.icone : t.icone,
+  };
+  salvarLocal();
+  render();
+}
+
+/** Exclui tarefa */
+function excluirTarefa(id) {
+  if (!confirm("Tem certeza que deseja excluir esta tarefa?")) return;
+  state.tarefas = state.tarefas.filter(t => t.id !== id);
+  salvarLocal();
+  render();
+}
+
+/** Alterna status (pendente <-> concluída) */
+function alternarStatus(id) {
+  const t = state.tarefas.find(x => x.id === id);
+  if (!t) return;
+  t.status = (t.status === "pendente") ? "concluida" : "pendente";
+  salvarLocal();
+  render();
+}
+
+// ============================ Modal/Form =============================
+
+const modal = document.getElementById("modalTarefa");
+const form = document.getElementById("formTarefa");
+const fecharModalBtn = document.getElementById("fecharModal");
+const btnNovaTarefa = document.getElementById("btnNovaTarefa");
+const btnSalvar = document.getElementById("salvarTarefa");
+
+/** Limpa e abre o modal para nova tarefa */
+function abrirModalNova() {
+  form.reset();
+  document.getElementById("tarefaId").value = "";
+  document.getElementById("iconeEscolhido").value = "";
+  document.getElementById("modalTitulo").textContent = "Nova Tarefa";
+  // limpa estado de ícones
+  document.querySelectorAll(".icon-choice").forEach(b => b.classList.remove("active"));
+  modal.showModal();
+}
+
+/** Preenche e abre o modal para editar */
+function abrirModalEdicao(id) {
+  const t = state.tarefas.find(x => x.id === id);
+  if (!t) return;
+  document.getElementById("tarefaId").value = t.id;
+  document.getElementById("titulo").value = t.titulo;
+  document.getElementById("tipo").value = t.tipo;
+  document.getElementById("dataEntrega").value = t.dataEntrega;
+  document.getElementById("pagina").value = t.pagina;
+  document.getElementById("descricao").value = t.descricao;
+  // status
+  form.querySelectorAll('input[name="status"]').forEach(r => r.checked = (r.value === t.status));
+  // ícone
+  document.getElementById("iconeEscolhido").value = t.icone || "";
+  document.querySelectorAll(".icon-choice").forEach(b => {
+    b.classList.toggle("active", b.dataset.icon === t.icone);
+  });
+  document.getElementById("modalTitulo").textContent = "Editar Tarefa";
+  modal.showModal();
+}
+
+/** Fecha modal */
+function fecharModal() { modal.close(); }
+
+/** Converte arquivo de imagem em DataURL base64 */
+function arquivoParaDataURL(arquivo) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(arquivo);
+  });
+}
+
+/** Lida com envio do formulário */
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const id = document.getElementById("tarefaId").value || null;
+  const titulo = document.getElementById("titulo").value;
+  const tipo = document.getElementById("tipo").value;
+  const dataEntrega = document.getElementById("dataEntrega").value;
+  const pagina = document.getElementById("pagina").value;
+  const descricao = document.getElementById("descricao").value;
+  const status = form.querySelector('input[name="status"]:checked')?.value || "pendente";
+  const icone = document.getElementById("iconeEscolhido").value || null;
+  const arquivoImg = document.getElementById("imagem").files?.[0] || null;
+  const origem = "minhas-lições"
+
+  // Validação simples
+  if (!titulo || !tipo || !dataEntrega || !pagina) {
+    alert("Por favor, preencha todos os campos obrigatórios (*)");
+    return;
+  }
+
+  let imagemDataURL = undefined; // "undefined" para manter imagem anterior ao editar
+  if (arquivoImg) {
+    try { imagemDataURL = await arquivoParaDataURL(arquivoImg); }
+    catch { alert("Falha ao carregar imagem."); }
+  } else if (icone && !id) {
+    // Se é nova tarefa, e escolheu ícone (sem upload), zera imagem
+    imagemDataURL = null;
+  }
+
+  const dados = { titulo, tipo, dataEntrega, pagina, descricao, status, icone, imagem: imagemDataURL, origem};
+
+  if (!id) adicionarTarefa(dados);
+  else atualizarTarefa(id, dados);
+
+  fecharModal();
 });
 
-//Verificar lição repitida
-document.getElementById("addTaskButton").addEventListener("click", function () {
-    let taskInput = document.getElementById("taskInput").value.trim();
-    let taskDate = document.getElementById("task-date").value;
-    let taskList = document.getElementById("taskList");
-    
-    if (taskInput === "") {
-        alert("Por favor, insira uma tarefa válida!");
-        return;
-    }
-    
-    // Verifica se a tarefa já existe na lista
-    let tasks = document.querySelectorAll("#taskList li");
-    for (let task of tasks) {
-        if (task.textContent === taskInput) {
-            alert("Essa tarefa já foi adicionada!");
-            return;
-        }
-    }
-    
-    // Cria um novo item na lista
-    let listItem = document.createElement("li");
-    listItem.textContent = taskInput + (taskDate ? " (Para: " + taskDate + ")" : "");
-    taskList.appendChild(listItem);
-    
-    // Limpa o campo de entrada
-    document.getElementById("taskInput").value = "";
-    document.getElementById("task-date").value = "";
+// Ícones rápidos
+document.querySelectorAll(".icon-choice").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const icone = btn.dataset.icon;
+    document.getElementById("iconeEscolhido").value = icone;
+    document.querySelectorAll(".icon-choice").forEach(b => b.classList.toggle("active", b === btn));
+    // Se escolher ícone, limpamos o input de arquivo (se houver algo)
+    document.getElementById("imagem").value = "";
+  });
 });
+
+btnNovaTarefa.addEventListener("click", abrirModalNova);
+fecharModalBtn.addEventListener("click", fecharModal);
+
+// ============================ Filtros / Busca / Ordenação ============
+
+/** Navbar: filtros rápidos */
+document.querySelectorAll(".nav-btn[data-filter]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".nav-btn[data-filter]").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    state.filtro = btn.dataset.filter;
+    render();
+  });
+});
+
+// Menu "Por Tipo"
+const dropdown = document.querySelector(".nav-dropdown");
+const btnPorTipo = document.getElementById("btnPorTipo");
+btnPorTipo.addEventListener("click", () => {
+  dropdown.classList.toggle("open");
+});
+document.getElementById("menuTipos").addEventListener("click", (e) => {
+  const item = e.target.closest(".nav-item");
+  if (!item) return;
+  // Marca a aba como ativa visualmente
+  document.querySelectorAll(".nav-btn[data-filter]").forEach(b => b.classList.remove("active"));
+  btnPorTipo.classList.add("active");
+  dropdown.classList.remove("open");
+  state.filtro = "tipo:" + item.dataset.type;
+  render();
+});
+
+// Busca por título
+document.getElementById("busca").addEventListener("input", (e) => {
+  state.busca = e.target.value;
+  render();
+});
+
+// Ordenação por data
+document.getElementById("ordenacao").addEventListener("change", (e) => {
+  state.ordenacao = e.target.value;
+  render();
+});
+
+// ============================ Exportar / Importar =====================
+
+document.getElementById("btnExportar").addEventListener("click", () => {
+  const blob = new Blob([JSON.stringify({ tarefas: state.tarefas }, null, 2)], { type: "application/json;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  const data = new Date().toISOString().slice(0,10);
+  a.download = `agenda_virtual_${data}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById("importarArquivo").addEventListener("change", async (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  try {
+    const text = await file.text();
+    const json = JSON.parse(text);
+    if (!json || !Array.isArray(json.tarefas)) throw new Error("Arquivo inválido.");
+    // Mescla sem duplicar por id (se colidir, atualiza a existente)
+    const map = new Map(state.tarefas.map(t => [t.id, t]));
+    for (const t of json.tarefas) {
+      if (map.has(t.id)) {
+        map.set(t.id, { ...map.get(t.id), ...t });
+      } else {
+        map.set(t.id, t);
+      }
+    }
+    state.tarefas = Array.from(map.values());
+    salvarLocal();
+    render();
+    alert("Tarefas importadas com sucesso!");
+  } catch (err) {
+    alert("Falha ao importar JSON: " + err.message);
+  } finally {
+    e.target.value = ""; // limpa input
+  }
+});
+
+// ============================ Drag & Drop =============================
+
+let dragSrcId = null;
+
+function handleDragStart(e) {
+  dragSrcId = this.dataset.id;
+  e.dataTransfer.effectAllowed = "move";
+  this.style.opacity = "0.6";
+}
+
+function handleDragOver(e) {
+  e.preventDefault(); // permite drop
+  e.dataTransfer.dropEffect = "move";
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  const alvoId = this.dataset.id;
+  if (!dragSrcId || dragSrcId === alvoId) return;
+
+  const lista = state.tarefas.sort((a,b) => (a.order || 0) - (b.order || 0));
+  const origemIdx = lista.findIndex(t => t.id === dragSrcId);
+  const alvoIdx = lista.findIndex(t => t.id === alvoId);
+
+  if (origemIdx === -1 || alvoIdx === -1) return;
+
+  // Reordena array (modo simples: mover origem para a posição do alvo)
+  const [movida] = lista.splice(origemIdx, 1);
+  lista.splice(alvoIdx, 0, movida);
+
+  // Reatribui 'order' incremental
+  lista.forEach((t, i) => t.order = i + 1);
+
+  salvarLocal();
+  render();
+}
+
+function handleDragEnd() {
+  this.style.opacity = "";
+  dragSrcId = null;
+}
+
+// ============================ Tema ===================================
+
+const btnTema = document.getElementById("btnTema");
+btnTema.addEventListener("click", () => {
+  state.tema = (state.tema === "claro") ? "escuro" : "claro";
+  aplicarTema();
+  salvarLocal();
+});
+
+// ============================ Inicialização ===========================
+
+function init() {
+  carregarLocal();
+  aplicarTema();
+  iniciarRelogio();
+
+  adicionarTarefasFixas(); // <<< adiciona tarefas fixas primeiro
+  state.filtro = "todas";  // garante que todas apareçam inicialmente
+  render();
+
+  // Acessibilidade: fechar dropdown ao clicar fora
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".nav-dropdown")) {
+      document.querySelector(".nav-dropdown")?.classList.remove("open");
+    }
+  });
+}
+
+
+
+// Inicia app quando DOM estiver pronto
+document.addEventListener("DOMContentLoaded", init);
