@@ -1,169 +1,225 @@
- Max: 35 <br/>
-Gênero: Aventura <br/>
-O texto deve ser feito na 3ª pessoa!</p>
-                <p class="para">Para 01/04/2025</p>
-            </div>
-        </div>
-        
-        <div class="card" class="Lição" id="Lição4">
-            <img src="https://cdn-icons-png.flaticon.com/512/207/207473.png" alt="Lição de casa" class="card-image">
-            <div class="card-content">
-                <h3 class="card-title">Lição de casa</h3>
-                <h4></h4>
-                <p class="card-description" id="card-description1"></p>
-                <p class="para">Para 31/03/2025</p>
-            </div>
-        </div>
-        
-        <div class="card" class="Lição" id="Lição5">
-            <img src="https://cdn-icons-png.flaticon.com/512/207/207473.png" alt="Lição de casa" class="card-image">
-            <div class="card-content">
-                <h3 class="card-title">Lição de casa</h3>
-                <h4>Inglês</h4>
-                <p class="card-description" id="card-description1">Pág: 16</p>
-                <p class="para">Para 07/04/2025</p>
-            </div>
-        </div>
-        
-        <div class="card" class="Lição" id="Lição6">
-            <img src="https://cdn-icons-png.flaticon.com/512/207/207473.png" alt="Lição de casa" class="card-image">
-            <div class="card-content">
-                <h3 class="card-title">Lição de casa</h3>
-                <h4>História</h4>
-                <p class="card-description" id="card-description1">Pág: 235 e 229</p>
-                <p class="para">Para 02/04/2025</p>
-            </div>
-        </div>
-        
-        <div class="card" class="Lição" id="Lição7">
-            <img src="https://cdn-icons-png.flaticon.com/512/207/207473.png" alt="Lição de casa" class="card-image">
-            <div class="card-content">
-                <h3 class="card-title">Lição de casa</h3>
-                <h4></h4>
-                <p class="card-description" id="card-description1"></p>
-                <p class="para">Para 07/03/2025</p>
-            </div>
-        </div>
-        
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agenda Virtual</title>
+  <!--
+    Projeto: Agenda Virtual (pt-BR)
+    Autor: Você (com ajuda do ChatGPT)
+    Descrição: Aplicação para criar, visualizar, editar, excluir e organizar tarefas/lições.
+    Observação: Todo o código está comentado em português para fins didáticos.
+  -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Cabeçalho da aplicação com título, data/hora dinâmicas e alternância de tema -->
+  <header class="topbar">
+    <div class="brand">
+      <img src="data:image/svg+xml;utf8,<?xml version='1.0' encoding='UTF-8'?><svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24' fill='none' stroke='%23007acc' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='4' width='18' height='18' rx='3' ry='3'/><line x1='16' y1='2' x2='16' y2='6'/><line x1='8' y1='2' x2='8' y2='6'/><line x1='3' y1='10' x2='21' y2='10'/></svg>" alt="Ícone Agenda">
+      <h1>Agenda Virtual</h1>
+    </div>
 
+    <div class="top-actions">
+      <!-- Data e hora atualizadas via JS -->
+      <div class="clock" id="relogio" aria-live="polite" title="Data e hora atuais"></div>
 
+      <!-- Alternância de tema claro/escuro -->
+      <button id="btnTema" class="btn ghost" aria-label="Alternar tema claro/escuro" title="Modo claro/escuro">🌗</button>
+    </div>
+  </header>
 
+  <!-- Navegação principal para filtros rápidos -->
+  <nav class="navbar">
+    <!--
+      Os botões de navegação alteram o filtro ativo:
+      - Todas as Tarefas
+      - Pendentes
+      - Concluídas
+      - Por Tipo (filtra por TC Online, Trabalho, Lição Comum)
+    -->
+    <button class="nav-btn active" data-filter="todas">Todas as Tarefas</button>
+    <button class="nav-btn" data-filter="pendentes">Pendentes</button>
+    <button class="nav-btn" data-filter="concluidas">Concluídas</button>
+    <button class="nav-btn" data-filter="pre-anotadas">Pré Anotadas</button>
+    <button class="nav-btn" data-filter="minhas-lições">Minhas Lições</button>
+    <div class="nav-dropdown">
+      <button class="nav-btn" id="btnPorTipo">Por Tipo ▾</button>
+      <div class="nav-menu" id="menuTipos">
+        <button class="nav-item" data-type="TC Online">TC Online</button>
+        <button class="nav-item" data-type="Trabalho">Trabalho</button>
+        <button class="nav-item" data-type="Lição Comum">Lição Comum</button>
+      </div>
+    </div>
+  </nav>
 
+  <!-- Barra de ferramentas (busca, ordenação, exportação/importação, adicionar) -->
+  <section class="toolbar">
+    <!-- Campo de busca por título -->
+    <input id="busca" type="search" placeholder="Buscar por título..." aria-label="Buscar por título" />
 
-        <div class="card" class="Lição" id="Trabalho1">
-            <img src="https://png.pngtree.com/png-clipart/20230504/original/pngtree-team-work-line-icon-png-image_9137751.png" alt="Lição de casa" class="card-image">
-            <div class="card-content">
-                <h3 class="card-title">Trabalho</h3>
-                <h4></h4>
-                <p class="card-description" id="card-description1"></p>
-                <p class="para">Para 12/03/2025</p>
-                <button onclick="window.open('https://www.vatican.va/various/cappelle/index_sistina_en.htm', '_blank')" class="cardbutton">
-                    Abrir Capela Sistina
-                </button>
-                
-            </div>
-        </div>
-        
-        <div class="card" class="Lição" id="Trabalho2">
-            <img src="https://png.pngtree.com/png-clipart/20230504/original/pngtree-team-work-line-icon-png-image_9137751.png" alt="Lição de casa" class="card-image">
-            <div class="card-content">
-                <h3 class="card-title">Trabalho</h3>
-                <h4>História</h4>
-                <p class="card-description" id="card-description1">Instrução: Crie algo que valorize a capacidade humana (Pintura, Poema, Escultura, Maquete)</p>
-                <p class="para">Para 03/04/2025</p>
-            </div>
-        </div>
-        
-        <div class="card" class="Lição" id="Trabalho3">
-            <img src="https://png.pngtree.com/png-clipart/20230504/original/pngtree-team-work-line-icon-png-image_9137751.png" alt="Lição de casa" class="card-image">
-            <div class="card-content">
-                <h3 class="card-title">Trabalho</h3>
-                <h4></h4>
-                <p class="card-description" id="card-description1"></p>
-                <p class="para">Para 03/04/2025</p>
-            </div>
-        </div>
-        
-        <div class="card" class="Lição" id="Trabalho4">
-            <img src="https://png.pngtree.com/png-clipart/20230504/original/pngtree-team-work-line-icon-png-image_9137751.png" alt="Lição de casa" class="card-image">
-            <div class="card-content">
-                <h3 class="card-title">Trabalho</h3>
-                <h4></h4>
-                <p class="card-description" id="card-description1"></p>
-                <p class="para">Para 03/04/2025</p>
-            </div>
-        </div>
-        
-        <div class="card" class="Lição" id="Trabalho5">
-            <img src="https://png.pngtree.com/png-clipart/20230504/original/pngtree-team-work-line-icon-png-image_9137751.png" alt="Lição de casa" class="card-image">
-            <div class="card-content">
-                <h3 class="card-title">Trabalho</h3>
-                <h4></h4>
-                <p class="card-description" id="card-description1"></p>
-                <p class="para">Para 03/04/2025</p>
-            </div>
-        </div>
+    <!-- Ordenação por data de entrega -->
+    <select id="ordenacao" aria-label="Ordenar por data de entrega">
+      <option value="asc">Data: mais próxima → mais distante</option>
+      <option value="desc">Data: mais distante → mais próxima</option>
+    </select>
 
+    <!-- Botões de exportar/importar JSON -->
+    <div class="io-actions">
+      <button id="btnExportar" class="btn">Exportar JSON</button>
+      <label for="importarArquivo" class="btn ghost">Importar JSON</label>
+      <input id="importarArquivo" type="file" accept="application/json" hidden />
+    </div>
 
+    <!-- Botão para criar nova tarefa -->
+    <button id="btnNovaTarefa" class="btn primary">+ Nova Tarefa</button>
+  </section>
 
+  <!-- Indicador de progresso (tarefas concluídas / total) -->
+  <section class="progress-wrap" aria-label="Progresso de tarefas">
+    <div class="progress-info">
+      <span id="progressoTexto">0 de 0 concluídas</span>
+    </div>
+    <div class="progressbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+      <div class="progressbar-fill" id="progressoBarra"></div>
+    </div>
+  </section>
 
-        <div class="card" class="TcOnline" id="Tc1">
-            <img src="https://i.ytimg.com/vi/GWDAqMEBUnk/maxresdefault.jpg" alt="Lição de casa" class="card-image">
-            <div class="card-content">
-                <h3 class="card-title">Tc Online</h3>
-                <h4></h4>
-                <p class="card-description" id="card-description1"></p>
-                <p class="para">Para 12/03/2025</p>
-                <button onclick="window.open('https://atividades.plurall.net/material/11728500/?search_disciplines%5B%5D=geografia', '_blank')" class="cardbutton">
-                    Abrir Tc Online
-                </button>
-                
-            </div>
-        </div>
+  <!-- Lista de tarefas (cartões) com suporte a drag-and-drop -->
+  <main>
+    <section id="listaTarefas" class="cards" aria-live="polite">
+      <!-- Os cartões são gerados dinamicamente pelo script.js -->
+    </section>
+  </main>
 
-        <div class="card" class="TcOnline" id="Tc2">
-            <img src="https://i.ytimg.com/vi/GWDAqMEBUnk/maxresdefault.jpg" alt="Lição de casa" class="card-image">
-            <div class="card-content">
-                <h3 class="card-title">Tc Online</h3>
-                <h4></h4>
-                <p class="card-description" id="card-description1"></p>
-                <p class="para">Data indeterminada (Prof não revelou a data)</p>
-                <button onclick="window.open('https://atividades.plurall.net/material/11728500/?search_disciplines%5B%5D=lingua_portuguesa', '_blank')" class="cardbutton">
-                    Abrir Tc Online
-                </button>
-                
-            </div>
-        </div>
+  <!-- Rodapé simples -->
+  <footer class="footer">
+    <p>Feito com ❤️ para anotar suas lições — Feito por XPloitShade</p>
+  </footer>
 
-        <div class="card" class="TcOnline" id="Tc3">
-            <img src="https://i.ytimg.com/vi/GWDAqMEBUnk/maxresdefault.jpg" alt="Lição de casa" class="card-image">
-            <div class="card-content">
-                <h3 class="card-title">Tc Online</h3>
-                <h4></h4>
-                <p class="card-description" id="card-description1"></p>
-                <p class="para">Para 14/03/2025</p>
-                <button onclick="window.open('https://atividades.plurall.net/material/11728500/?search_disciplines%5B%5D=geografia', '_blank')" class="cardbutton">
-                    Abrir Tc Online
-                </button>
-                
-            </div>
-        </div>
+  <!-- Modal de formulário para adicionar/editar tarefa -->
+  <dialog id="modalTarefa">
+    <form id="formTarefa" method="dialog">
+      <header class="modal-head">
+        <h2 id="modalTitulo">Nova Tarefa</h2>
+        <button type="button" class="btn ghost" id="fecharModal" aria-label="Fechar">✕</button>
+      </header>
 
-        <div class="card" class="TcOnline" id="Tc4">
-            <img src="https://i.ytimg.com/vi/GWDAqMEBUnk/maxresdefault.jpg" alt="Lição de casa" class="card-image">
-            <div class="card-content">
-                <h3 class="card-title">Tc Online</h3>
-                <h4></h4>
-                <p class="card-description" id="card-description1"></p>
-                <p class="para">Para 12/03/2025</p>
-                <button onclick="window.open('https://atividades.plurall.net/material/11728500/?search_disciplines%5B%5D=geografia', '_blank')" class="cardbutton">
-                    Abrir Tc Online
-                </button>
-                
-            </div>
-        </div>
-        <p>Atualizações em breve</p>
+      <!-- Campo oculto para ID da tarefa ao editar -->
+      <input type="hidden" id="tarefaId" />
+
+      <div class="form-grid">
+        <!-- Título da tarefa -->
+        <label>
+          <span>Título *</span>
+          <input type="text" id="titulo" placeholder="Ex.: Exercícios de Matemática" required />
+        </label>
+
+        <!-- Tipo de lição -->
+        <label>
+          <span>Tipo da Lição *</span>
+          <select id="tipo" required>
+            <option value="" disabled selected>Selecione...</option>
+            <option>TC Online</option>
+            <option>Trabalho</option>
+            <option>Lição Comum</option>
+          </select>
+        </label>
+
+        <!-- Data de entrega -->
+        <label>
+          <span>Data de Entrega *</span>
+          <input type="date" id="dataEntrega" required />
+        </label>
+
+        <!-- Página -->
+        <label>
+          <span>Página / Local *</span>
+          <input type="text" id="pagina" placeholder="Ex.: página 34 do livro" required />
+        </label>
+
+        <!-- Descrição -->
+        <label class="full">
+          <span>Descrição</span>
+          <textarea id="descricao" rows="3" placeholder="Detalhes da tarefa, instruções, etc."></textarea>
+        </label>
+
+        <!-- Status -->
+        <fieldset class="status-group">
+          <legend>Status</legend>
+          <label class="radio">
+            <input type="radio" name="status" value="pendente" checked />
+            <span>Pendente</span>
+          </label>
+          <label class="radio">
+            <input type="radio" name="status" value="concluida" />
+            <span>Concluída</span>
+          </label>
+        </fieldset>
+
+        <!-- Imagem: upload OU seleção de ícone -->
+        <div class="full image-picker">
+          <label class="upload">
+            <span>Imagem da Tarefa (opcional)</span>
+            <input type="file" id="imagem" accept="image/*" />
+          </label>
+
+<div class="icon-choices" role="group" aria-label="Escolha rápida de imagem">
+  <button type="button" class="icon-choice" data-icon="📘" title="Livro">📘</button>
+  <button type="button" class="icon-choice" data-icon="🧪" title="Ciências">🧪</button>
+  <button type="button" class="icon-choice" data-icon="📝" title="Redação">📝</button>
+  <button type="button" class="icon-choice" data-icon="💻" title="Computação">💻</button>
+  <button type="button" class="icon-choice" data-icon="📐" title="Matemática">📐</button>
+  <button type="button" class="icon-choice" data-icon="🎨" title="Artes">🎨</button>
+  <button type="button" class="icon-choice" data-icon="🎵" title="Música">🎵</button>
+  <button type="button" class="icon-choice" data-icon="🌍" title="Geografia">🌍</button>
+  <button type="button" class="icon-choice" data-icon="📖" title="Leitura">📖</button>
+  <button type="button" class="icon-choice" data-icon="🧮" title="Álgebra">🧮</button>
+  <button type="button" class="icon-choice" data-icon="🔬" title="Biologia">🔬</button>
+  <button type="button" class="icon-choice" data-icon="⚽" title="Esportes">⚽</button>
+  <button type="button" class="icon-choice" data-icon="✏️" title="Escrita">✏️</button>
+  <button type="button" class="icon-choice" data-icon="📊" title="Estatística">📊</button>
 </div>
-</body>
 
+          <!-- Campo oculto para armazenar o ícone escolhido quando não há upload -->
+          <input type="hidden" id="iconeEscolhido" />
+        </div>
+      </div>
+
+      <menu class="modal-actions">
+        <button class="btn ghost" value="cancel">Cancelar</button>
+        <button class="btn primary" id="salvarTarefa" value="default">Salvar</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <template id="cardTemplate">
+    <!--
+      Template base para um cartão de tarefa. Será clonado pelo JS.
+      Usamos <article> para manter semântica.
+    -->
+    <article class="card" draggable="true" data-id="">
+      <div class="card-image"></div>
+      <div class="card-content">
+        <header class="card-head">
+          <h3 class="card-title"></h3>
+          <span class="badge tipo"></span>
+        </header>
+        <p class="card-desc"></p>
+        <dl class="meta">
+          <div><dt>Entrega:</dt><dd class="vencimento"></dd></div>
+          <div><dt>Página:</dt><dd class="pagina"></dd></div>
+          <div><dt>Status:</dt><dd class="status"></dd></div>
+        </dl>
+      </div>
+      <footer class="card-actions">
+        <button class="btn sm toggle-status">Concluir</button>
+        <button class="btn sm ghost editar">Editar</button>
+        <button class="btn sm danger excluir">Excluir</button>
+      </footer>
+    </article>
+  </template>
+
+  <script src="script.js"></script>
+</body>
 </html>
