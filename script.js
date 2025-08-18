@@ -203,7 +203,7 @@ function adicionarTarefasFixas() {
       titulo: "Trabalho de Artes",
       descricao: "Fazer uma maquete de uma casa",
       dataEntrega: "2025-08-21",
-      pagina: "",
+      pagina: "-",
       tipo: "Trabalho",
       status: "pendente",
       icone: "🎨",
