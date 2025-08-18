@@ -121,17 +121,17 @@ function criarCard(tarefa) {
   node.dataset.id = tarefa.id;
 
   // Aplica borda colorida se for pré-anotada
-  if (tarefa.tipo === "pre-anotadas") {
-    node.classList.add("tipo-pre-anotadas");
+  // Aplica borda colorida se for pré-anotada
 
-    if (tarefa.status === "pendente") {
-      node.style.border = "3px solid #e74c3c"; // vermelho
-      node.style.boxShadow = "0 0 10px rgba(231, 76, 60, 0.5)";
-    } else if (tarefa.status === "concluida") {
-      node.style.border = "3px solid #2ecc71"; // verde
-      node.style.boxShadow = "0 0 10px rgba(46, 204, 113, 0.5)";
-    }
+  if (tarefa.status === "pendente") {
+    node.style.border = "3px solid #e74c3c"; // vermelho
+    node.style.boxShadow = "0 0 10px rgba(231, 76, 60, 0.5)";
+  } else if (tarefa.status === "concluida") {
+    node.style.border = "3px solid #2ecc71"; // verde
+    node.style.boxShadow = "0 0 10px rgba(46, 204, 113, 0.5)";
   }
+
+
 
   // Imagem ou ícone
   const imgWrap = node.querySelector(".card-image");
@@ -178,10 +178,6 @@ function criarCard(tarefa) {
 
 
 function adicionarTarefasFixas() {
-  // Checa se já existe alguma tarefa do tipo 'pre-anotadas'
-  const existemFixas = state.tarefas.some(t => t.origem === "pre-anotadas");
-  if (existemFixas) return;
-
   const fixas = [
     {
       titulo: "Lição de Matemática",
@@ -210,13 +206,19 @@ function adicionarTarefasFixas() {
       pagina: "",
       tipo: "Trabalho",
       status: "pendente",
-      icone: "🌍",
+      icone: "🎨",
       origem: "pre-anotadas",
     },
   ];
 
-  fixas.forEach(dados => adicionarTarefa(dados));
+  fixas.forEach(dados => {
+    const jaExiste = state.tarefas.some(t => t.titulo === dados.titulo && t.origem === "pre-anotadas");
+    if (!jaExiste) {
+      adicionarTarefa(dados);
+    }
+  });
 }
+
 
 /** Renderiza todas as tarefas conforme filtros/ordenação/pesquisa */
 function render() {
