@@ -180,16 +180,6 @@ function criarCard(tarefa) {
 function adicionarTarefasFixas() {
   const fixas = [
     {
-      titulo: "Lição de Matemática",
-      descricao: "Lição Básica de Matemática sobre termos semelhantes e expressões algébricas.",
-      dataEntrega: "2025-08-19",
-      pagina: "p.433 ex 14 e 15",
-      tipo: "Lição Comum",
-      status: "pendente",
-      icone: "🧮",
-      origem: "pre-anotadas",
-    },
-    {
       titulo: "Lição de Geografia",
       descricao: "Lição Sobre mineração e recursos naturais.",
       dataEntrega: "2025-08-20",
