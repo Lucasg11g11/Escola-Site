@@ -181,7 +181,7 @@ function adicionarTarefasFixas() {
   const fixas = [
     {
       titulo: "Lição de Geografia",
-      descricao: "Lição Sobre mineração e recursos naturais.",
+      descricao: "Lição sobre mineração e recursos naturais.",
       dataEntrega: "2025-08-20",
       pagina: "p.250 ex 2 e 3",
       tipo: "Lição Comum",
@@ -201,12 +201,22 @@ function adicionarTarefasFixas() {
     },
   ];
 
+  // 1. Remover pré-anotadas que não estão mais na lista oficial
+  state.tarefas = state.tarefas.filter(t => {
+    if (t.origem !== "pre-anotadas") return true; // mantém as normais
+    return fixas.some(f => f.titulo === t.titulo); // só mantém se ainda existe em fixas
+  });
+
+  // 2. Adicionar novas fixas que ainda não existem
   fixas.forEach(dados => {
     const jaExiste = state.tarefas.some(t => t.titulo === dados.titulo && t.origem === "pre-anotadas");
     if (!jaExiste) {
       adicionarTarefa(dados);
     }
   });
+
+  // 3. Re-renderizar a lista
+  render();
 }
 
 
