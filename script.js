@@ -183,7 +183,7 @@ function adicionarTarefasFixas() {
       titulo: "Lição de Geografia",
       descricao: "Lição sobre mineração e recursos naturais.",
       dataEntrega: "2025-08-20",
-      pagina: "p.250 ex 2 e 3",
+      pagina: "p.252 ex 2 e 3",
       tipo: "Lição Comum",
       status: "pendente",
       icone: "🌍",
