@@ -180,16 +180,6 @@ function criarCard(tarefa) {
 function adicionarTarefasFixas() {
   const fixas = [
     {
-      titulo: "Lição de Geografia",
-      descricao: "Lição sobre mineração e recursos naturais.",
-      dataEntrega: "2025-08-20",
-      pagina: "p.252 ex 2 e 3",
-      tipo: "Lição Comum",
-      status: "pendente",
-      icone: "🌍",
-      origem: "pre-anotadas",
-    },
-    {
       titulo: "Trabalho de Artes",
       descricao: "Fazer uma maquete de uma casa",
       dataEntrega: "2025-08-21",
