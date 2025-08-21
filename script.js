@@ -180,13 +180,13 @@ function criarCard(tarefa) {
 function adicionarTarefasFixas() {
   const fixas = [
     {
-      titulo: "Trabalho de Artes",
-      descricao: "Fazer uma maquete de uma casa",
+      titulo: "Tc online de Geografia",
+      descricao: "Fazer o Tc online de geografia para a prova, vale nota ",
       dataEntrega: "2025-08-21",
-      pagina: "-",
-      tipo: "Trabalho",
+      pagina: "Módulo 7 e 8",
+      tipo: "Tc Online",
       status: "pendente",
-      icone: "🎨",
+      icone: "🌎",
       origem: "pre-anotadas",
     },
   ];
