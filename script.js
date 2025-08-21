@@ -184,7 +184,7 @@ function adicionarTarefasFixas() {
       descricao: "Fazer o Tc online de geografia para a prova, vale nota ",
       dataEntrega: "2025-08-21",
       pagina: "Módulo 7 e 8",
-      tipo: "Tc Online",
+      tipo: "TC Online",
       status: "pendente",
       icone: "🌎",
       origem: "pre-anotadas",
