@@ -180,13 +180,33 @@ function criarCard(tarefa) {
 function adicionarTarefasFixas() {
   const fixas = [
     {
-      titulo: "Tc online de Geografia",
-      descricao: "Fazer o Tc online de geografia para a prova, vale nota ",
-      dataEntrega: "2025-08-21",
-      pagina: "Módulo 7 e 8",
-      tipo: "TC Online",
+      titulo: "Lição de Geografia",
+      descricao: "Lição de geografia até segunda",
+      dataEntrega: "2026-02-09",
+      pagina: "248 ex 1 e 2",
+      tipo: "Lição Comum",
       status: "pendente",
       icone: "🌎",
+      origem: "pre-anotadas",
+    },
+    {
+      titulo: "Lição de Matemática",
+      descricao: "Lição de matemática até amanhã",
+      dataEntrega: "2026-02-05",
+      pagina: "439 ex:1, 445 ex:1 e 2",
+      tipo: "Lição Comum",
+      status: "pendente",
+      icone: "📐",
+      origem: "pre-anotadas",
+    },
+    {
+      titulo: "Lição de Inglês",
+      descricao: "Lição de inglês até sexta",
+      dataEntrega: "2026-02-11",
+      pagina: "4 e 5 wb",
+      tipo: "Lição Comum",
+      status: "pendente",
+      icone: "🏴󠁧󠁢󠁥󠁮󠁧󠁿🇺🇸",
       origem: "pre-anotadas",
     },
   ];
